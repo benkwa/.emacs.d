@@ -1,0 +1,6 @@
+[submodule "packages/hungry-delete"]
+	path = packages/hungry-delete
+	url = https://github.com/nflath/hungry-delete.git
+[submodule "packages/zenburn-emacs"]
+	path = packages/zenburn-emacs
+	url = https://github.com/benkwa/zenburn-emacs.git
