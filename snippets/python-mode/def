@@ -1,0 +1,12 @@
+# -*- mode: python; yas-indent-line: 1 -*-
+# name: pydef
+# key: def
+# --
+def $1($2):
+    """$1
+
+    $&{2:$(bkyas-param-list text)}
+
+    $&@return:
+    """
+    $0

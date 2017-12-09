@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: base
+# key: base
+# --
+`(bkyas-base)`($0);

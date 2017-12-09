@@ -1,0 +1,5 @@
+# -*- mode: js -*-
+# name: def
+# key: def
+# --
+goog.async.Deferred

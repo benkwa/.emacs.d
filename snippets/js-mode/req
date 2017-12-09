@@ -1,0 +1,4 @@
+# name: req
+# key: req
+# --
+goog.require('$0');
