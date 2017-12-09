@@ -416,6 +416,8 @@ that uses 'compilation-error-face'."
   (setq indent-tabs-mode nil
         python-indent-line-functions nil
         paragraph-start "\f\\|[ \t]*$\\|[ \t]*[-+*] \\|[ \t]*@[a-z]")
+  (local-set-key [C-next] 'python-nav-forward-defun)
+  (local-set-key [C-prior] 'python-nav-backward-defun)
   (python-indent-guess-indent-offset))
 
 ;; append so our custom values win 
