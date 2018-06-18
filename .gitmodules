@@ -4,3 +4,7 @@
 [submodule "packages/zenburn-emacs"]
 	path = packages/zenburn-emacs
 	url = https://github.com/benkwa/zenburn-emacs.git
+[submodule "packages/zenburn-el"]
+	path = packages/zenburn-el
+	url = https://github.com/dbrock/zenburn-el.git
+	branch = master
