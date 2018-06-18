@@ -43,7 +43,7 @@
 ;; Done, now we just use it as a clause in our make-hippie-expand-function (as above)
 (setq hippie-expand-try-functions-list
       '(
-        yas-hippie-try-expand
+;        yas-hippie-try-expand
         try-expand-dabbrev
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill

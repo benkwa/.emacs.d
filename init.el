@@ -1,5 +1,4 @@
 ;; add .site-lisp and site-lisp in home directory to load path
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -15,10 +14,14 @@
 
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+            '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
-(with-eval-after-load "git-commit-mode" (debug))
-(defun git-commit-mode (&rest args) nil)
+;(with-eval-after-load "git-commit-mode" (debug))
+;(defun git-commit-mode (&rest args) nil)
+
+; If in a screen, activate normal-erase-is-backspace-mode.
+(if (getenv "STY")
+    (normal-erase-is-backspace-mode 0))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; scrolling and navigation
@@ -94,32 +97,27 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tag-related stuff
-;(require 'find-file-in-tags)
-;(require 'etags-select)
+(require 'bk-find-file)
 
-(defun bk-find-file(arg)
-  "Runs find-file (with prefix arg) or find-file-in-tags (without)"
-  (interactive "P")
-  (if (or (not tags-file-name) arg)
-      ; if called with a prefix arg, or if there is no tags-file, just run
-      ; find-file.
-      (call-interactively 'find-file)
-    ; else, call find-file-in-tags
-    (call-interactively 'find-file-in-tags)))
 (global-set-key (kbd "C-x C-f") 'bk-find-file)
 
 ;; read in the local tags file if one exists
-(if (file-exists-p "./TAGS")
-     (visit-tags-table "./TAGS")
-)
+(let ((my-tags-file (locate-dominating-file default-directory "TAGS")))
+  (when my-tags-file
+    (message "Loading tags file: %s" my-tags-file)
+    (visit-tags-table my-tags-file)))
 
-(global-set-key (kbd "M-.") 'etags-select-find-tag)
-(global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
+;; (if (file-exists-p "./TAGS")
+;;      (visit-tags-table "./TAGS")
+;; )
+
+;(global-set-key (kbd "M-.") 'etags-select-find-tag)
+;(global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; yasnippet
-(require 'bk-yasnippets)
+;(require 'bk-yasnippets)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tab expansion
@@ -140,7 +138,7 @@
         (when (and (= p (point))
                    (not (bolp)))
           (hippie-expand nil))))))
-                   
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hungry delete ALL the things.
@@ -227,11 +225,11 @@
 
 ;; texinfo
 (add-hook 'Info-mode-hook
-  '(lambda() (define-key Info-mode-map [down-mouse-1] 
+  '(lambda() (define-key Info-mode-map [down-mouse-1]
 	       'Info-mouse-follow-nearest-node)))
 ;; Buffer Menu
 (add-hook 'buffer-menu-mode-hook
-  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1] 
+  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1]
 	       'Buffer-menu-mouse-select)))
 
 ;; If non-nil each line of text is exactly one screen line, else wrap text.
@@ -277,14 +275,17 @@
 	'("\\.tpl" . html-mode)
 	'("crontab" . crontab-mode)
 	'("\\.xml" . xml-mode)
-	'("\\.html" . html-mode))
+	'("\\.html" . html-mode)
+        '("\\.h\\'" . c++-mode)
+        '("\\.inl\\'" . c++-mode)
+        '("\\.cu\\'" . c++-mode)
+        '("\\.mojom\\'" . c++-mode)
+        '("\\.sh\\'" . shell-script-mode)
+        '("\\.tcsh\\'" . shell-script-mode)
+        '("\\.bash\\'" . shell-script-mode)
+        '("\\.env\\'" . shell-script-mode)
+        '("\\.ebuild\\'" . shell-script-mode))
        auto-mode-alist))
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.mojom\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.env\\'" . shell-script-mode))
-(add-to-list 'auto-mode-alist '("\\.ebuild\\'" . shell-script-mode))
 
 ;; (autoload 'glsl-mode "glsl-mode" nil t)
 ;; (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
@@ -345,8 +346,9 @@
 (setq line-number-mode t)
 (setq column-number-mode t)
 
-;; always use spaces instead of tabs, highlight the icky
+;; always use spaces instead of tabs.  Indents are 4 spaces.
 (setq-default indent-tabs-mode nil)
+(setq-default c-basic-offset 4)
 
 ;; camelCamelCamel
 (subword-mode)
@@ -393,7 +395,7 @@ that uses 'compilation-error-face'."
   `((,(format "^%s\\(.+\\)" (make-string width ?.))
      (1 compilation-error-face t))))
 
-(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 80))
+(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
 (font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
 (font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
 (font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
@@ -409,9 +411,12 @@ that uses 'compilation-error-face'."
         paragraph-start "\f\\|[ \t]*$\\|[ \t]*[-+*] \\|[ \t]*@[a-z]")
   (local-set-key [C-next] 'python-nav-forward-defun)
   (local-set-key [C-prior] 'python-nav-backward-defun)
-  (python-indent-guess-indent-offset))
+; This doesn't appear to work in emacs 23.1
+  (python-indent-guess-indent-offset)
+  (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+)
 
-;; append so our custom values win 
+;; append so our custom values win
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
 
@@ -421,8 +426,8 @@ that uses 'compilation-error-face'."
 ;; (setq-default comment-style 'extra-line)
 
 ;; js error finding in compilation buffers
-;(pushnew '(bk-js "^##[[:space:]]*\\([a-zA-Z0-9_/]+\.js\\):\\([0-9]+\\):[[:space:]]*\\(WARNING\\|ERROR\\)*" 1 2)
-;         compilation-error-regexp-alist-alist)
+;; (pushnew '(bk-js "^##[[:space:]]*\\([a-zA-Z0-9_/]+\.js\\):\\([0-9]+\\):[[:space:]]*\\(WARNING\\|ERROR\\)*" 1 2)
+;;          compilation-error-regexp-alist-alist)
 ;; only support js errors for now
 ;; (setq compilation-error-regexp-alist (list 'bk-js))
 
@@ -466,7 +471,7 @@ that uses 'compilation-error-face'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
 
-(defun bk-java-mode-hook () 
+(defun bk-java-mode-hook ()
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
@@ -484,7 +489,7 @@ that uses 'compilation-error-face'."
 
 ;; Android customizations
 ; append rather than prepend this because it overrides other java mode settings
-(defun bk-android-java-hook () 
+(defun bk-android-java-hook ()
   (setq c-basic-offset 4)
 )
 ;(add-hook 'java-mode-hook 'bk-android-java-hook 1)
@@ -514,6 +519,7 @@ that uses 'compilation-error-face'."
   ;; (local-set-key (kbd "<tab>") 'bk-tab-dwim)
   ;; (local-set-key (kbd "TAB") 'bk-tab-dwim)
   (local-set-key (kbd "<C-return>") 'semantic-complete-analyze-and-replace)
+  (local-set-key (kbd "<C-tab>") 'ff-find-other-file)
   (setq skeleton-pair 1)
   (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
   (setq c-offsets-alist
@@ -524,7 +530,8 @@ that uses 'compilation-error-face'."
           '(arglist-cont-nonempty bk-arglist-cont c-lineup-arglist)
           )
          c-offsets-alist))
-        
+  (set-fill-column 120)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 )
 (add-hook 'c++-mode-hook 'bk-c++-mode-hook)
 (add-hook 'c++-mode-hook 'subword-mode)
@@ -660,12 +667,40 @@ that uses 'compilation-error-face'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; themes stuff
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/packages/zenburn-emacs")
-;; (if (not (display-graphic-p))
-;;     (defvar zenburn-override-colors-alist
-;;       '(("zenburn-bg"  . "ARGBBB000000")
-;;         ("zenburn-bk-region-bg" . "ARGBBB000000"))))
-(load-theme 'zenburn t)
+(if (version< emacs-version "24")
+    (progn
+      (require 'color-theme)
+      (require 'zenburn)
+      (color-theme-zenburn))
+  (progn
+    (add-to-list 'custom-theme-load-path "~/.emacs.d/packages/zenburn-emacs")
+    ;; (if (not (display-graphic-p))
+    ;;     (defvar zenburn-override-colors-alist
+    ;;       '(("zenburn-bg"  . "ARGBBB000000")
+    ;;         ("zenburn-bk-region-bg" . "ARGBBB000000"))))
+    (load-theme 'zenburn t)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; semantic
+
+(global-ede-mode 1)
+(require 'semantic/sb)
+
+(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode) ; Maintain tag database.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode) ; Reparse buffer when idle.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode) ; Show summary of tag at point.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode) ; Show completions when idle.
+;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode) ; Additional tag decorations.
+(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode) ; Highlight the current tag.
+(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode) ; Show current fun in header line.
+(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode) ; Provide `switch-to-buffer'-like keybinding for tag names.
+;; (add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode) ; A mouse 3 context menu.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-local-symbol-highlight-mode) ; Highlight references of the symbol under point.
+(semantic-mode 1)
+
+(global-set-key '[(C-down-mouse-1)] 'semantic-ia-fast-mouse-jump)
+
 
 (global-ede-mode 1)
 (require 'semantic/sb)
@@ -690,11 +725,8 @@ that uses 'compilation-error-face'."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("4528fb576178303ee89888e8126449341d463001cb38abe0015541eb798d8a23" "509e911d1e83e7f6616e8cff6b3826d69e1af655de7aa143ecf85b1e27e4bfe4" default)))
  '(menu-bar-mode nil)
- '(package-selected-packages (quote (f magit yasnippet js2-mode)))
+ '(package-selected-packages (quote (magithub f magit yasnippet js2-mode)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -702,3 +734,4 @@ that uses 'compilation-error-face'."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(smerge-refined-added ((t (:inherit smerge-refined-change :background "#308430")))))
+(setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el
