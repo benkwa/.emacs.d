@@ -13,10 +13,6 @@
 (let ((default-directory "~/.emacs.d/packages"))
   (normal-top-level-add-subdirs-to-load-path))
 
-  
-;; load google-specific packages
-(require 'bk-google)
-
 (require 'package)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
@@ -98,8 +94,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tag-related stuff
-(require 'find-file-in-tags)
-(require 'etags-select)
+;(require 'find-file-in-tags)
+;(require 'etags-select)
 
 (defun bk-find-file(arg)
   "Runs find-file (with prefix arg) or find-file-in-tags (without)"
@@ -128,7 +124,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tab expansion
 (require 'bk-hippie-expand)
-(require 'google-ycmd)
 
 (defun bk-tab-dwim ()
   "If in the minibuffer, call minibuffer-expand. Else, if mark is
@@ -307,10 +302,6 @@
 
 (require 'compile)
 
-;; support for blaze builds - not for pulsar, though
-(require 'google3-build)
-(global-set-key (kbd "S-<f7>") 'google3-build)
-
 ;; TODO unhackify this
 (setq-default compile-command "git build") ;; //photos/chromeapp:pulsar_unpacked_debug
 (global-set-key (kbd "<f7>") 'compile)
@@ -427,14 +418,11 @@ that uses 'compilation-error-face'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; js stuff
 
-;; load googley js libraries; fix indentation
-(require 'bk-google-js2-patch)
-
 ;; (setq-default comment-style 'extra-line)
 
 ;; js error finding in compilation buffers
-(pushnew '(bk-js "^##[[:space:]]*\\([a-zA-Z0-9_/]+\.js\\):\\([0-9]+\\):[[:space:]]*\\(WARNING\\|ERROR\\)*" 1 2)
-         compilation-error-regexp-alist-alist)
+;(pushnew '(bk-js "^##[[:space:]]*\\([a-zA-Z0-9_/]+\.js\\):\\([0-9]+\\):[[:space:]]*\\(WARNING\\|ERROR\\)*" 1 2)
+;         compilation-error-regexp-alist-alist)
 ;; only support js errors for now
 ;; (setq compilation-error-regexp-alist (list 'bk-js))
 
@@ -504,15 +492,39 @@ that uses 'compilation-error-face'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; cpp stuff
 
+(defun bk-arglist-cont (elem)
+  ;; (save-excursion
+  ;;   (let ((indent-pos)))
+  ;;   )
+  (save-excursion
+    (back-to-indentation)
+    (let ((col (current-column))
+          (cur (+ (c-langelem-col c-syntactic-element) (* 2 c-basic-offset))))
+      (message "current column: %d" col)
+      (message "langelem-col: %d" cur)
+      (if (not (= cur col))
+        (progn
+          (message "returning 0")
+          (vector cur))))))
+
 (defun bk-c++-mode-hook ()
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-  (local-set-key (kbd "<tab>") 'bk-tab-dwim)
-  (local-set-key (kbd "TAB") 'bk-tab-dwim)
-
+  ;; (local-set-key (kbd "<tab>") 'bk-tab-dwim)
+  ;; (local-set-key (kbd "TAB") 'bk-tab-dwim)
+  (local-set-key (kbd "<C-return>") 'semantic-complete-analyze-and-replace)
   (setq skeleton-pair 1)
   (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
+  (setq c-offsets-alist
+        (append
+         (list
+          '(innamespace . 0)
+          '(arglist-intro . ++)
+          '(arglist-cont-nonempty bk-arglist-cont c-lineup-arglist)
+          )
+         c-offsets-alist))
+        
 )
 (add-hook 'c++-mode-hook 'bk-c++-mode-hook)
 (add-hook 'c++-mode-hook 'subword-mode)
@@ -654,6 +666,21 @@ that uses 'compilation-error-face'."
 ;;       '(("zenburn-bg"  . "ARGBBB000000")
 ;;         ("zenburn-bk-region-bg" . "ARGBBB000000"))))
 (load-theme 'zenburn t)
+
+(global-ede-mode 1)
+(require 'semantic/sb)
+
+(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode) ; Maintain tag database.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode) ; Reparse buffer when idle.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode) ; Show summary of tag at point.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode) ; Show completions when idle.
+;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode) ; Additional tag decorations.
+(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode) ; Highlight the current tag.
+(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode) ; Show current fun in header line.
+(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode) ; Provide `switch-to-buffer'-like keybinding for tag names.
+;; (add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode) ; A mouse 3 context menu.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-local-symbol-highlight-mode) ; Highlight references of the symbol under point.
+(semantic-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; customize stuff
