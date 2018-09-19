@@ -9,3 +9,8 @@
 
 # Undo-tree save-files
 *.~undo-tree
+
+# Caches and saved data
+semanticdb
+elpa
+ede-projects.el

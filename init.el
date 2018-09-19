@@ -539,6 +539,65 @@ that uses 'compilation-error-face'."
 (add-hook 'c++-mode-hook 'electric-pair-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; emacs server
+
+;; (server-start)
+;; (add-hook 'server-switch-hook
+;;           (lambda nil
+;;             (let ((server-buf (current-buffer)))
+;;               (bury-buffer)
+;;               (switch-to-buffer-other-frame server-buf))))
+;; (add-hook 'server-done-hook 'delete-frame)
+;; (add-hook 'server-done-hook (lambda nil (kill-buffer nil)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org stuff
+
+(require 'org)
+(require 'org-protocol)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+(setq org-startup-indented t)
+(setq org-agenda-files (list "~/org/inbox.org"
+                             "~/org/work.org"
+                             "~/org/now.org"))
+(setq org-capture-templates
+      (quote
+       (("w"
+         "Default template"
+         entry
+         (file+headline "~/org/inbox.org" "Inbox")
+         "* %^{Title}\n\n  Source: %u, %c\n\n  %i"
+         :empty-lines 1)
+        ("l"
+         "Link template"
+         entry
+         (file+headline "~/org/inbox.org" "Inbox")
+         "* %c %T"
+         :empty-lines 1
+         :immediate-finish 1)
+        ;; ... more templates here ...
+        )))
+
+;; Open links in chromium
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "chromium-browser")
+
+;; Refile targets
+(setq org-refile-targets '((nil :maxlevel . 1)
+                           (org-agenda-files :maxlevel . 1)
+                           ("~/org/done.org" :maxlevel . 1)))
+
+(defun bk-org-agenda-mode-hook()
+  (local-set-key (kbd "j") 'org-agenda-next-line)
+  (local-set-key (kbd "k") 'org-agenda-previous-line)
+  )
+(add-hook 'org-agenda-mode-hook 'bk-org-agenda-mode-hook)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; currently not working stuff (need to fix)
 
@@ -726,7 +785,7 @@ that uses 'compilation-error-face'."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode nil)
- '(package-selected-packages (quote (magithub f magit yasnippet js2-mode)))
+ '(package-selected-packages (quote (org-edna magithub f magit yasnippet js2-mode)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
