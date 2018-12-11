@@ -558,11 +558,17 @@ that uses 'compilation-error-face'."
 (require 'org-protocol)
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cc" 'org-capture)
 (setq org-log-done t)
 (setq org-startup-indented t)
+
 (setq org-agenda-files (list "~/org/inbox.org"
                              "~/org/work.org"
                              "~/org/now.org"))
+;; A do-nothing function for capturing to current point 
+(defun bk-paste-link-template-point ()
+  (interactive)
+  )
 (setq org-capture-templates
       (quote
        (("w"
@@ -578,6 +584,14 @@ that uses 'compilation-error-face'."
          "* %c %T"
          :empty-lines 1
          :immediate-finish 1)
+        ("v"
+         "Paste link template"
+         plain
+         (function bk-paste-link-template-point)
+         "[[%c][>>]]"
+         :empty-lines 0
+         :immediate-finish 1
+         :unnarrowed 1)
         ;; ... more templates here ...
         )))
 
@@ -792,5 +806,6 @@ that uses 'compilation-error-face'."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-link ((t (:foreground "green2" :underline t))))
  '(smerge-refined-added ((t (:inherit smerge-refined-change :background "#308430")))))
 (setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el
