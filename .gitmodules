@@ -4,3 +4,6 @@
 [submodule "packages/zenburn-emacs"]
 	path = packages/zenburn-emacs
 	url = https://github.com/benkwa/zenburn-emacs.git
+[submodule "packages/dropbox"]
+	path = packages/dropbox
+	url = https://github.com/pavpanchekha/dropbox.el.git
