@@ -265,18 +265,22 @@
 (setq magit-last-seen-setup-instructions "1.4.0")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Highlight long lines
+;; Draw a line to highlight the fill column.
 
-(defun font-lock-width-keyword (width)
-  "Return a font-lock style keyword for a string beyond width WIDTH
-that uses 'compilation-error-face'."
-  `((,(format "^%s\\(.+\\)" (make-string width ?.))
-     (1 compilation-error-face t))))
+(require 'fill-column-indicator)
+(setq fci-rule-width 1)
+ ;; this doesn't work for some reason.  Have to set it in each buffer.
+(setq fci-rule-color "green")
 
-(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
-(font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
-(font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
+
+;; (font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
+;; (font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
+;; (font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
+;; (font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
+
+(defun bk-show-fill-column()
+  (setq fci-rule-color "green")
+  (fci-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff
@@ -291,11 +295,13 @@ that uses 'compilation-error-face'."
 ; This doesn't appear to work in emacs 23.1
   (python-indent-guess-indent-offset)
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+  (setq fill-column 80)
 )
 
 ;; append so our custom values win 
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
+(add-hook 'python-mode-hook 'bk-show-fill-column)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
@@ -367,6 +373,8 @@ that uses 'compilation-error-face'."
 (add-hook 'c++-mode-hook 'subword-mode)
 (add-hook 'c++-mode-hook 'electric-indent-mode)
 (add-hook 'c++-mode-hook 'electric-pair-mode)
+(add-hook 'c++-mode-hook 'bk-show-fill-column)
+
 (setq electric-pair-pairs '(
                             (?{ . ?})
                             (?[ . ?])
