@@ -1,35 +1,36 @@
-;; add .site-lisp and site-lisp in home directory to load path
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-;; Add my lisp code to the load path.
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
-;; Add packages to the load path
-(let ((default-directory "~/.emacs.d/packages"))
-  (normal-top-level-add-subdirs-to-load-path))
-
 (require 'package)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
+;; Add packages and its subdirs to the load path.
+(let ((default-directory "~/.emacs.d/packages"))
+  (normal-top-level-add-subdirs-to-load-path))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scrolling and navigation
+;; My packages and customizations
 
-;; Set scroll-margin to 0 for smooth scrolling.
-(setq scroll-margin 0)
-(setq hscroll-step 1)
+;; Add my customizations to the load path.
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
-;; Scroll one vertical line, 0 means center.
-;; (setq scroll-step 0)
-;; A value >100 means that scrolling point of-screen will never re-center it.
-(setq scroll-conservatively 101)
+;; org mode customizations
+(require 'bk-org)
 
-;; no scroll bars
-(set-scroll-bar-mode nil)
+;; semantic and ede customizations
+;; experimental; not working yet
+; (require 'bk-ede)
+
+;; snippets and expansions
+(require 'bk-yasnippets)
+
+(require 'dropbox)
+(if (require 'bk-dropbox-token nil t)
+    (setq dropbox-access-token bk-dropbox-access-token))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,11 +42,6 @@
 (global-set-key (kbd "<C-home>") 'beginning-of-buffer)
 (global-set-key (kbd "<C-end>") 'end-of-buffer)
 (global-set-key (kbd "C-z") 'undo)
-
-(global-set-key (kbd "<C-up>") 'bk-scroll-down-one-line)
-(global-set-key (kbd "M-p") '(lambda () (interactive) (scroll-down 1)))
-(global-set-key (kbd "<C-down>") 'bk-scroll-up-one-line)
-(global-set-key (kbd "M-n") '(lambda () (interactive) (scroll-up 1)))
 
 
 ;; Indent
@@ -81,22 +77,9 @@
 
 (require 'font-lock)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; tag-related stuff
-(require 'bk-find-file)
-
-(global-set-key (kbd "C-x C-f") 'bk-find-file)
-
-;; read in the local tags file if one exists
-(let ((my-tags-file (locate-dominating-file default-directory "TAGS")))
-  (when my-tags-file
-    (message "Loading tags file: %s" my-tags-file)
-    (visit-tags-table my-tags-file)))
-
-;(global-set-key (kbd "M-.") 'etags-select-find-tag)
-;(global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
-
+;; scrolling, navigation, tag-related stuff
+(require 'bk-navigation)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tab expansion
@@ -126,65 +109,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Jumps to next buffer in the bufferlist, consecutive uses will browse trough all your buffers
-(defun switch-to-next-buffer()
-  "Jumps to next buffer in the buffer list, or the beginning of the list if at the end"
-  (interactive)
-  (let ((cur (current-buffer))
-	(ok t))
-    ;; Find current buffer in list
-    (while (and cur ok)
-      (setq cur (next-buffer cur (current-buffer)))
-      (if cur
-	  (if (buffer-allowed cur)
-	      (setq ok nil))))
-    (if (and cur (not ok))
-	(switch-to-buffer cur t))))
-
-;; Jumps to next buffer in the bufferlist, consecutive uses will browse trough all your buffers
-(defun next-buffer(buf orig)
-  "Jumps to next buffer in the buffer list, or the beginning of the list if at the end"
-  (interactive)
-  (let ((lst (buffer-list))
-	nxt
-	cur)
-    ;; Find current buffer in list
-    (while (and lst (not (eq buf (car lst))))
-      (setq cur (car lst))
-      (setq lst (cdr lst)))
-    ;; Get next
-    (setq nxt (car (cdr lst)))
-    (if (eq nxt orig)
-	nil)
-    ;; If zero get first.
-    (if nxt
-	()
-      (setq nxt (car (buffer-list))))
-    nxt))
-
-(defun buffer-allowed( buf )
-  (interactive)
-  (let ((incs buffer-include-regexp)
-	inc
-	(bname (buffer-name buf))
-	(allow nil))
-    (while (and incs (not allow))
-      (setq inc (car incs))
-      (if (string-match inc bname)
-	  (setq allow t))
-      (setq incs (cdr incs)))
-    (if allow
-	(let ((exs buffer-exclude-regexp)
-	      ex)
-	  (while (and exs allow)
-	    (setq ex (car exs))
-	    (if (string-match ex bname)
-		(setq allow nil))
-	    (setq exs (cdr exs)))
-	  allow)
-      allow)))
-
 ; Auto-insert text when making new *.cpp, *.cc, *.h files.
 (require 'autoinsert)
 ;(add-hook 'find-file-hooks 'auto-insert)
@@ -284,6 +208,9 @@
 ;;                             (width . 180)
 ;;                             (height . 35)))))
 
+(setq compile-command "bkbuild")
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc behaviour and other tweaks
@@ -308,9 +235,6 @@
 (setq-default indent-tabs-mode nil)
 (setq-default c-basic-offset 4)
 
-;; camelCamelCamel
-(subword-mode)
-
 ;; make the default fill column value 80
 (setq-default fill-column 80)
 
@@ -333,12 +257,8 @@
 (make-directory "~/.emacs.d/autosaves/" t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; building stuff
-(setq compile-command "bkbuild")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; magit
-;; (require 'magit)
+;;(require 'magit)
 ;; We don't use vc-next-action anyways; just use existing muscle memory.
 (global-set-key (kbd "C-x v v") 'magit-status)
 ;; Disable annoying magit warnings
@@ -357,7 +277,6 @@ that uses 'compilation-error-face'."
 (font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
 (font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
 (font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
-(font-lock-add-keywords 'borg-mode (font-lock-width-keyword 80))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff
@@ -377,45 +296,6 @@ that uses 'compilation-error-face'."
 ;; append so our custom values win 
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; js stuff
-
-;; (setq-default comment-style 'extra-line)
-
-;; js error finding in compilation buffers
-;(pushnew '(bk-js "^##[[:space:]]*\\([a-zA-Z0-9_/]+\.js\\):\\([0-9]+\\):[[:space:]]*\\(WARNING\\|ERROR\\)*" 1 2)
-;         compilation-error-regexp-alist-alist)
-;; only support js errors for now
-;; (setq compilation-error-regexp-alist (list 'bk-js))
-
-(defun bk-js-mode-hook ()
-  (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
-  (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
-  (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-  (local-set-key (kbd "<tab>") 'bk-tab-dwim)
-  (local-set-key (kbd "TAB") 'bk-tab-dwim)
-
-  (setq indent-line-function 'js2-indent-line)
-  (setq js2-basic-offset 2)
-
-  (setq skeleton-pair 1)
-  (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
-)
-
-(add-hook 'js-mode-hook 'bk-js-mode-hook)
-(add-hook 'js-mode-hook 'subword-mode)
-(add-hook 'js-mode-hook 'electric-indent-mode)
-(add-hook 'js-mode-hook 'electric-pair-mode)
-
-
-;; highlight stuff that goes over the 80-char limit
-(make-face 'my-80col-face)
-(set-face-attribute 'my-80col-face nil :foreground "yellow":background "red")
-(add-hook 'js-mode-hook (lambda()
-                          (font-lock-add-keywords
-                           nil
-                           '(("^.\\{80\\}\\(.\\)" 1 'my-80col-face prepend)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
@@ -493,143 +373,6 @@ that uses 'compilation-error-face'."
                             (?( . ?))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org stuff
-
-(require 'org)
-(require 'org-protocol)
-;; Store links in any buffers
-(define-key global-map "\C-cl" 'org-store-link)
-;; Call up agenda from any buffer
-(define-key global-map "\C-ca" 'org-agenda)
-;; Add a new key binding for org-capture
-(define-key global-map "\C-cc" 'org-capture)
-;; Log timestamps for done items
-(setq org-log-done t)
-;; Start in indented mode
-(setq org-startup-indented t)
-(setq org-tags-column -80)
-
-(setq org-agenda-files (list "~/org/_inbox.org" 
-                             "~/org/home.org"
-                             "~/org/ping.org"
-                             ))
-
-(setq org-refile-targets
-      '((nil :maxlevel . 1)
-        (org-agenda-files :maxlevel . 1)
-        ("~/org/done.org" :maxlevel . 1)
-        ("~/org/later.org" :maxlevel . 1)))
-
-;; A do-nothing function for capturing to current point
-(defun bk-paste-link-template-point ()
-  (interactive)
-  )
-
-(setq org-capture-templates
-      (quote
-       (("w"
-         "Default template"
-         entry
-         (file+headline "~/org/inbox.org" "Inbox")
-         "* %^{Title}\n\n  Source: %u, %c\n\n  %i"
-         :empty-lines 1)
-        ("l"
-         "Link template"
-         entry
-         (file+headline "~/org/inbox.org" "Inbox")
-         "* %c %T"
-         :empty-lines 1
-         :immediate-finish 1)
-        ("v"
-         "Paste link template"
-         plain
-         (function bk-paste-link-template-point)
-         "[[%c][>>]]"
-         :empty-lines 0
-         :immediate-finish 1
-         :unnarrowed 1)
-        ;; ... more templates here ...
-        )))
-
-(defadvice org-capture
-    (after make-full-window-frame activate)
-  "Advise capture to be the only window when used as a popup"
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-other-windows)))
-
-(defadvice org-capture-finalize
-    (after delete-capture-frame activate)
-  "Advise capture-finalize to close the frame"
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-frame)))
-
-(defun bk-org-agenda-mode-hook ()
-  (local-set-key (kbd "j") 'org-agenda-next-line)
-  (local-set-key (kbd "k") 'org-agenda-previous-line)
-  )
-
-(add-hook 'org-agenda-mode-hook 'bk-org-agenda-mode-hook)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; currently not working stuff (need to fix)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; server stuff
-
-;; (add-hook 'server-switch-hook
-;; 	  (lambda nil
-;; 	    (let ((server-buf (current-buffer)))
-;; 	      (bury-buffer)
-;; 	      (switch-to-buffer-other-frame server-buf))))
-;; (add-hook 'server-done-hook 'delete-frame)
-
-;; returns t if the current buffer is an emacs-client file
-;; (defun is-buffer-a-client ()
-;;   (interactive)
-;;   (let ((cls server-clients)
-;; 	cl
-;; 	bufs
-;; 	buf
-;; 	(ok nil))
-;;     (while cls
-;;       (setq cl (car cls))
-;;       (setq bufs (cdr cl))
-;;       (while bufs
-;; 	(setq buf (car bufs))
-;; 	(if (eq buf (current-buffer))
-;; 	    (setq ok t))
-;; 	(setq bufs (cdr bufs)))
-;;       (setq cls (cdr cls)))
-;;     ok))
-;; (add-hook 'server-switch-hook 'make-frame-command)
-;; (add-hook 'server-done-hook '(lambda ()
-;; 			       (interactive)
-;;  			       (if (is-buffer-a-client)
-;;  				   (delete-frame))))
-;; (add-hook 'server-switch-hook
-;;             (lambda ()
-;;               (when (current-local-map)
-;;                 (use-local-map (copy-keymap (current-local-map))))
-;; 	      (when server-buffer-clients
-;; 		(local-set-key (kbd "C-x k") 'server-edit))))
-
-;; emacsclients frames are popping up behind other windows; fix this
-;; (add-hook 'server-visit-hook
-;;           (lambda()
-;;             (raise-frame)))
-
-;; (defun px-raise-frame-and-give-focus ()
-;;   (when window-system
-;;     (raise-frame)
-;;     (x-focus-frame (selected-frame))
-;;     (set-mouse-pixel-position (selected-frame) 4 4)
-;;     ))
-
-;; (add-hook 'server-switch-hook
-;;           'px-raise-frame-and-give-focus)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
 (require 'smerge-mode)
@@ -689,8 +432,6 @@ that uses 'compilation-error-face'."
 
 ;; find files in tags
 ;; (require 'find-file-in-tags)
-
-;; (autoload 'camelCase-mode "camelCase-mode")
 
 ;; (autoload 'gtags-mode "gtags" "" t)
 
