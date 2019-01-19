@@ -8,3 +8,7 @@
 	path = packages/zenburn-el
 	url = https://github.com/dbrock/zenburn-el.git
 	branch = master
+[submodule "packages/dropbox"]
+	path = packages/dropbox
+	url = https://github.com/pavpanchekha/dropbox.el.git
+
