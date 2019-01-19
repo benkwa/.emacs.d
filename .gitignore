@@ -6,6 +6,7 @@
 
 # Backup files
 *~
+autosaves
 
 # Undo-tree save-files
 *.~undo-tree
@@ -15,4 +16,3 @@ semanticdb
 elpa
 ede-projects.el
 bookmarks
-

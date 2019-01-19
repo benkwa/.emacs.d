@@ -6,23 +6,15 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-; Add elisp and subdirs to the load path.
-;; (let ((default-directory "~/.emacs.d/elisp"))
-;;   (normal-top-level-add-subdirs-to-load-path))
+;; Add my lisp code to the load path.
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+;; Add packages to the load path
 (let ((default-directory "~/.emacs.d/packages"))
   (normal-top-level-add-subdirs-to-load-path))
 
 (require 'package)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-
-(require 'dropbox)
-(if (require 'bk-dropbox-token nil t)
-    (setq dropbox-access-token bk-dropbox-access-token))
-
-(with-eval-after-load "git-commit-mode" (debug))
-(defun git-commit-mode (&rest args) nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; scrolling and navigation
@@ -89,41 +81,22 @@
 
 (require 'font-lock)
 
-; Transparent windows in term mode
-;; (add-hook 'after-make-frame-functions
-;;           (lambda ()
-;;             (if (not display-graphic-p)
-;;                 (set-background-color "ARGBBB000000"))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tag-related stuff
-;(require 'find-file-in-tags)
-;(require 'etags-select)
+(require 'bk-find-file)
 
-(defun bk-find-file(arg)
-  "Runs find-file (with prefix arg) or find-file-in-tags (without)"
-  (interactive "P")
-  (if (or (not tags-file-name) arg)
-      ; if called with a prefix arg, or if there is no tags-file, just run
-      ; find-file.
-      (call-interactively 'find-file)
-    ; else, call find-file-in-tags
-    (call-interactively 'find-file-in-tags)))
 (global-set-key (kbd "C-x C-f") 'bk-find-file)
 
 ;; read in the local tags file if one exists
-(if (file-exists-p "./TAGS")
-     (visit-tags-table "./TAGS")
-)
+(let ((my-tags-file (locate-dominating-file default-directory "TAGS")))
+  (when my-tags-file
+    (message "Loading tags file: %s" my-tags-file)
+    (visit-tags-table my-tags-file)))
 
-(global-set-key (kbd "M-.") 'etags-select-find-tag)
-(global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
+;(global-set-key (kbd "M-.") 'etags-select-find-tag)
+;(global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; yasnippet
-(require 'bk-yasnippets)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tab expansion
@@ -212,13 +185,6 @@
 	  allow)
       allow)))
 
-
-;; (defun auto-update-header-file()
-;;   (save-excursion
-;;     (correct-c-header-define (current-buffer)))
-;;     (if (search-forward-regexp "[0-9][0-9][0-9][0-9]" nil t)
-;;         (replace-match "1234")))
-
 ; Auto-insert text when making new *.cpp, *.cc, *.h files.
 (require 'autoinsert)
 ;(add-hook 'find-file-hooks 'auto-insert)
@@ -270,9 +236,6 @@
 (add-hook 'docbook-mode-hook
 	  'turn-on-font-lock)
 
-;; You might want to make this the default for .sgml or .xml documents,
-;; or you might want to rely on -*- DocBook -*- on the first line,
-;; or perhaps buffer variables. It's up to you...
 (setq auto-mode-alist
       (append
        (list
@@ -281,19 +244,15 @@
 	'("\\.tpl" . html-mode)
 	'("crontab" . crontab-mode)
 	'("\\.xml" . xml-mode)
-	'("\\.html" . html-mode))
+	'("\\.html" . html-mode)
+        '("\\.h\\'" . c++-mode)
+        '("\\.inl\\'" . c++-mode)
+        '("\\.cu\\'" . c++-mode)
+        '("\\.sh\\'" . shell-script-mode)
+        '("\\.tcsh\\'" . shell-script-mode)
+        '("\\.bash\\'" . shell-script-mode)
+        '("\\.env\\'" . shell-script-mode)
        auto-mode-alist))
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.mojom\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.env\\'" . shell-script-mode))
-(add-to-list 'auto-mode-alist '("\\.ebuild\\'" . shell-script-mode))
-
-;; (autoload 'glsl-mode "glsl-mode" nil t)
-;; (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
-;; (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
-;; (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
 
 (setq inhibit-default-init t)
 
@@ -307,7 +266,7 @@
 (require 'compile)
 
 ;; TODO unhackify this
-(setq-default compile-command "git build") ;; //photos/chromeapp:pulsar_unpacked_debug
+(setq-default compile-command "git build")
 (global-set-key (kbd "<f7>") 'compile)
 
 ;; follow output in the compile window
@@ -316,7 +275,7 @@
 ;; don't ask for the compile command, save all files
 (setq compilation-read-command nil)
 (setq compilation-ask-about-save nil)
-;(setq compile-command "/path/to/script")
+
 ;; make compilers in a new frame.
 ;; (add-to-list 'special-display-buffer-names '("*Completions*" my-display-completions))
 
@@ -349,8 +308,9 @@
 (setq line-number-mode t)
 (setq column-number-mode t)
 
-;; always use spaces instead of tabs, highlight the icky
+;; always use spaces instead of tabs.  Indents are 4 spaces.
 (setq-default indent-tabs-mode nil)
+(setq-default c-basic-offset 4)
 
 ;; camelCamelCamel
 (subword-mode)
@@ -397,7 +357,7 @@ that uses 'compilation-error-face'."
   `((,(format "^%s\\(.+\\)" (make-string width ?.))
      (1 compilation-error-face t))))
 
-(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 80))
+(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
 (font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
 (font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
 (font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
@@ -413,7 +373,10 @@ that uses 'compilation-error-face'."
         paragraph-start "\f\\|[ \t]*$\\|[ \t]*[-+*] \\|[ \t]*@[a-z]")
   (local-set-key [C-next] 'python-nav-forward-defun)
   (local-set-key [C-prior] 'python-nav-backward-defun)
-  (python-indent-guess-indent-offset))
+; This doesn't appear to work in emacs 23.1
+  (python-indent-guess-indent-offset)
+  (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+)
 
 ;; append so our custom values win 
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
@@ -517,9 +480,11 @@ that uses 'compilation-error-face'."
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
   ;; (local-set-key (kbd "<tab>") 'bk-tab-dwim)
   ;; (local-set-key (kbd "TAB") 'bk-tab-dwim)
-  (local-set-key (kbd "<C-return>") 'semantic-complete-analyze-and-replace)
-  (setq skeleton-pair 1)
-  (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
+;  (local-set-key (kbd "<C-return>") 'semantic-complete-analyze-and-replace)
+   (local-set-key (kbd "<C-return>") 'hippie-expand)
+  (local-set-key (kbd "C-c C-x o") 'ff-find-other-file)
+ (setq skeleton-pair 1)
+;  (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
   (setq c-offsets-alist
         (append
          (list
@@ -528,12 +493,17 @@ that uses 'compilation-error-face'."
           '(arglist-cont-nonempty bk-arglist-cont c-lineup-arglist)
           )
          c-offsets-alist))
-        
+  (set-fill-column 120)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 )
 (add-hook 'c++-mode-hook 'bk-c++-mode-hook)
 (add-hook 'c++-mode-hook 'subword-mode)
 (add-hook 'c++-mode-hook 'electric-indent-mode)
 (add-hook 'c++-mode-hook 'electric-pair-mode)
+(setq electric-pair-pairs '(
+                            (?{ . ?})
+                            (?[ . ?])
+                            (?( . ?))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org stuff
@@ -544,6 +514,8 @@ that uses 'compilation-error-face'."
 (define-key global-map "\C-cl" 'org-store-link)
 ;; Call up agenda from any buffer
 (define-key global-map "\C-ca" 'org-agenda)
+;; Add a new key binding for org-capture
+(define-key global-map "\C-cc" 'org-capture)
 ;; Log timestamps for done items
 (setq org-log-done t)
 ;; Start in indented mode
@@ -561,6 +533,11 @@ that uses 'compilation-error-face'."
         ("~/org/done.org" :maxlevel . 1)
         ("~/org/later.org" :maxlevel . 1)))
 
+;; A do-nothing function for capturing to current point
+(defun bk-paste-link-template-point ()
+  (interactive)
+  )
+
 (setq org-capture-templates
       (quote
        (("w"
@@ -576,8 +553,17 @@ that uses 'compilation-error-face'."
          "* %c %T"
          :empty-lines 1
          :immediate-finish 1)
+        ("v"
+         "Paste link template"
+         plain
+         (function bk-paste-link-template-point)
+         "[[%c][>>]]"
+         :empty-lines 0
+         :immediate-finish 1
+         :unnarrowed 1)
         ;; ... more templates here ...
         )))
+
 (defadvice org-capture
     (after make-full-window-frame activate)
   "Advise capture to be the only window when used as a popup"
@@ -597,7 +583,6 @@ that uses 'compilation-error-face'."
 
 (add-hook 'org-agenda-mode-hook 'bk-org-agenda-mode-hook)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; currently not working stuff (need to fix)
 
@@ -726,27 +711,24 @@ that uses 'compilation-error-face'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; themes stuff
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/packages/zenburn-emacs")
-;; (if (not (display-graphic-p))
-;;     (defvar zenburn-override-colors-alist
-;;       '(("zenburn-bg"  . "ARGBBB000000")
-;;         ("zenburn-bk-region-bg" . "ARGBBB000000"))))
-(load-theme 'zenburn t)
+(if (version< emacs-version "24")
+    (progn
+      (require 'color-theme)
+      (require 'zenburn)
+      (color-theme-zenburn))
+  (progn
+    (add-to-list 'custom-theme-load-path "~/.emacs.d/packages/zenburn-emacs")
+    (load-theme 'zenburn t)))
 
-(global-ede-mode 1)
-(require 'semantic/sb)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; semantic
 
-(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode) ; Maintain tag database.
-(add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode) ; Reparse buffer when idle.
-(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode) ; Show summary of tag at point.
-(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode) ; Show completions when idle.
-;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode) ; Additional tag decorations.
-(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode) ; Highlight the current tag.
-(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode) ; Show current fun in header line.
-(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode) ; Provide `switch-to-buffer'-like keybinding for tag names.
-;; (add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode) ; A mouse 3 context menu.
-(add-to-list 'semantic-default-submodes 'global-semantic-idle-local-symbol-highlight-mode) ; Highlight references of the symbol under point.
-(semantic-mode 1)
+;(require 'bk-ede)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; load DWA customizations
+(if (file-exists-p "~/bk/dwa")
+    (require 'bk-dwa))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; customize stuff
@@ -756,15 +738,16 @@ that uses 'compilation-error-face'."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("4528fb576178303ee89888e8126449341d463001cb38abe0015541eb798d8a23" "509e911d1e83e7f6616e8cff6b3826d69e1af655de7aa143ecf85b1e27e4bfe4" default)))
  '(menu-bar-mode nil)
- '(package-selected-packages (quote (f magit yasnippet js2-mode)))
+ '(package-selected-packages
+   (quote
+    (request org-edna magithub f magit yasnippet js2-mode)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-link ((t (:foreground "green2" :underline t))))
  '(smerge-refined-added ((t (:inherit smerge-refined-change :background "#308430")))))
+(setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el
