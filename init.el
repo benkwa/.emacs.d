@@ -287,6 +287,8 @@
 
 (defun bk-python-mode-hook ()
   (local-set-key (kbd "<M-RET>") 'hippie-expand)
+  (local-set-key [C-next] 'python-nav-forward-defun)
+  (local-set-key [C-prior] 'python-nav-backward-defun)
   (setq indent-tabs-mode nil
         python-indent-line-functions nil
         paragraph-start "\f\\|[ \t]*$\\|[ \t]*[-+*] \\|[ \t]*@[a-z]")
