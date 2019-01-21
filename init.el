@@ -236,23 +236,19 @@
 (add-hook 'docbook-mode-hook
 	  'turn-on-font-lock)
 
-(setq auto-mode-alist
-      (append
-       (list
-	'("\\.css" . css-mode)
-	'("\\.gss" . css-mode)
-	'("\\.tpl" . html-mode)
-	'("crontab" . crontab-mode)
-	'("\\.xml" . xml-mode)
-	'("\\.html" . html-mode)
-        '("\\.h\\'" . c++-mode)
-        '("\\.inl\\'" . c++-mode)
-        '("\\.cu\\'" . c++-mode)
-        '("\\.sh\\'" . shell-script-mode)
-        '("\\.tcsh\\'" . shell-script-mode)
-        '("\\.bash\\'" . shell-script-mode)
-        '("\\.env\\'" . shell-script-mode)
-       auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.css" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.gss" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl" . html-mode))
+(add-to-list 'auto-mode-alist '("crontab" . crontab-mode))
+(add-to-list 'auto-mode-alist '("\\.xml" . xml-mode))
+(add-to-list 'auto-mode-alist '("\\.html" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.sh\\'" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.tcsh\\'" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.bash\\'" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.env\\'" . shell-script-mode))
 
 (setq inhibit-default-init t)
 
@@ -420,15 +416,6 @@ that uses 'compilation-error-face'."
                           (font-lock-add-keywords
                            nil
                            '(("^.\\{80\\}\\(.\\)" 1 'my-80col-face prepend)))))
-
-;; soy
-(autoload 'closure-template-html-mode "closure-template-html-mode" "Major mode for soy templates." t)
-(add-to-list 'auto-mode-alist '("\\.soy\\'" . closure-template-html-mode))
-
-(defun bk-soy-mode-hook ()
-  (set-fill-column 100)
-)
-(add-hook 'closure-template-html-mode-hook 'bk-soy-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
