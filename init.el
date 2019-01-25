@@ -28,10 +28,8 @@
 ;; snippets and expansions
 (require 'bk-yasnippets)
 
-(require 'dropbox)
-(if (require 'bk-dropbox-token nil t)
-    (setq dropbox-access-token bk-dropbox-access-token))
-
+;; scrolling, finding files, switching buffers
+(require 'bk-navigation)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
@@ -77,9 +75,6 @@
 
 (require 'font-lock)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scrolling, navigation, tag-related stuff
-(require 'bk-navigation)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tab expansion
@@ -267,20 +262,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Draw a line to highlight the fill column.
 
+;; Try out new width indicator.
 (require 'fill-column-indicator)
 (setq fci-rule-width 1)
  ;; this doesn't work for some reason.  Have to set it in each buffer.
 (setq fci-rule-color "green")
 
+(defun bk-show-fill-column()
+  (setq fci-rule-color "green")
+  (fci-mode))
 
+;; Old width indicator code.
+;; (defun font-lock-width-keyword (width)
+;;   "Return a font-lock style keyword for a string beyond width WIDTH
+;; that uses 'compilation-error-face'."
+;;   `((,(format "^%s\\(.+\\)" (make-string width ?.))
+;;      (1 compilation-error-face t))))
 ;; (font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
 ;; (font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
 ;; (font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
 ;; (font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
-
-(defun bk-show-fill-column()
-  (setq fci-rule-color "green")
-  (fci-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff

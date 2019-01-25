@@ -93,8 +93,34 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tag support
 
-;(require 'find-file-in-tags)
-;(require 'etags-select)
+;; read in the local tags file if one exists
+(let ((my-tags-file (locate-dominating-file default-directory "TAGS")))
+  (when my-tags-file
+    (message "Loading tags file: %s" my-tags-file)
+    (visit-tags-table my-tags-file)))
+
+
+;(global-set-key (kbd "M-.") 'etags-select-find-tag)
+;(global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
+
+;;; using ido find file in tag files
+(defun tags-extra-get-all-tags-files ()
+  "Return all, fully qualified, file names."
+  (save-excursion
+    (let ((first-time t)
+          (res nil))
+      (while (visit-tags-table-buffer (not first-time))
+        (setq first-time nil)
+        (setq res
+              (append res (mapcar 'expand-file-name (tags-table-files)))))
+      res)))
+
+(defun ido-find-file-in-tag-files ()
+  (interactive)
+  (find-file
+   (expand-file-name
+    (ido-completing-read
+     "Files: " (tags-extra-get-all-tags-files) nil t))))
 
 (defun bk-find-file(arg)
   "Runs find-file (with prefix arg) or find-file-in-tags (without)"
@@ -104,14 +130,9 @@
       ; find-file.
       (call-interactively 'find-file)
     ; else, call find-file-in-tags
-    (call-interactively 'find-file-in-tags)))
-(global-set-key (kbd "C-x C-f") 'bk-find-file)
+    (call-interactively 'ido-find-file-in-tag-files)))
 
-;; read in the local tags file if one exists
-(let ((my-tags-file (locate-dominating-file default-directory "TAGS")))
-  (when my-tags-file
-    (message "Loading tags file: %s" my-tags-file)
-    (visit-tags-table my-tags-file)))
+(global-set-key (kbd "C-x C-f") 'bk-find-file)
 
 (global-set-key (kbd "M-.") 'etags-select-find-tag)
 (global-set-key (kbd "M-?") 'etags-select-find-tag-at-point)
