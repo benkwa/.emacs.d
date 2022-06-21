@@ -26,7 +26,7 @@
 ; (require 'bk-ede)
 
 ;; snippets and expansions
-(require 'bk-yasnippets)
+;(require 'bk-yasnippets)
 
 ;; scrolling, finding files, switching buffers
 (require 'bk-navigation)
@@ -95,12 +95,12 @@
         (when (and (= p (point))
                    (not (bolp)))
           (hippie-expand nil))))))
-                   
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hungry delete ALL the things.
-(require 'hungry-delete)
-(global-hungry-delete-mode)
+;(require 'hungry-delete)
+;(global-hungry-delete-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -116,11 +116,11 @@
 
 ;; texinfo
 (add-hook 'Info-mode-hook
-  '(lambda() (define-key Info-mode-map [down-mouse-1] 
+  '(lambda() (define-key Info-mode-map [down-mouse-1]
 	       'Info-mouse-follow-nearest-node)))
 ;; Buffer Menu
 (add-hook 'buffer-menu-mode-hook
-  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1] 
+  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1]
 	       'Buffer-menu-mouse-select)))
 
 ;; If non-nil each line of text is exactly one screen line, else wrap text.
@@ -251,9 +251,18 @@
 ;; create the autosave dir if necessary, since emacs won't.
 (make-directory "~/.emacs.d/autosaves/" t)
 
+;; Turn on the visible bell, and make it less annoying
+(setq ring-bell-function
+      (lambda ()
+        (let ((orig-fg (face-foreground 'mode-line)))
+          (set-face-foreground 'mode-line "#F2804F")
+          (run-with-idle-timer 0.1 nil
+                               (lambda (fg) (set-face-foreground 'mode-line fg))
+                               orig-fg))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; magit
-;;(require 'magit)
+(require 'magit)
 ;; We don't use vc-next-action anyways; just use existing muscle memory.
 (global-set-key (kbd "C-x v v") 'magit-status)
 ;; Disable annoying magit warnings
@@ -301,7 +310,7 @@
   (setq fill-column 80)
 )
 
-;; append so our custom values win 
+;; append so our custom values win
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
 (add-hook 'python-mode-hook 'bk-show-fill-column)
@@ -309,7 +318,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
 
-(defun bk-java-mode-hook () 
+(defun bk-java-mode-hook ()
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
@@ -327,7 +336,7 @@
 
 ;; Android customizations
 ; append rather than prepend this because it overrides other java mode settings
-(defun bk-android-java-hook () 
+(defun bk-android-java-hook ()
   (setq c-basic-offset 4)
 )
 ;(add-hook 'java-mode-hook 'bk-android-java-hook 1)
@@ -415,6 +424,10 @@
   (save-some-buffers 1)
   (kill-emacs))
 
+(defun bk-save-as (filename)
+  (interactive "F")
+  (save-restriction (widen)  (write-region (point-min) (point-max) filename)))
+
 ;(add-to-list 'default-frame-alist '(font . "lucidasanstypewriter-14"))
 ;; new metacity has some font bug that causes emacs to hang up waiting
 ;; for a response when setting the font.  Tell emacs not to wait for
@@ -469,24 +482,11 @@
 (if (file-exists-p "~/bk/dwa")
     (require 'bk-dwa))
 
+(server-start)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; customize stuff
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(menu-bar-mode nil)
- '(package-selected-packages
-   (quote
-    (request org-edna magithub f magit yasnippet js2-mode)))
- '(tool-bar-mode nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-link ((t (:foreground "green2" :underline t))))
- '(smerge-refined-added ((t (:inherit smerge-refined-change :background "#308430")))))
 (setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el

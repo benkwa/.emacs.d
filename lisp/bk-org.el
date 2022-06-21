@@ -4,6 +4,7 @@
 (require 'org)
 (require 'org-protocol)
 (require 'org-feed)
+(require 'org-id)
 
 ;; Store links in any buffers
 (define-key global-map "\C-cl" 'org-store-link)
@@ -22,9 +23,7 @@
 ;; Use path-style refile targets; allow refiling to the top level.
 (setq org-refile-use-outline-path 'file)
 
-(setq org-agenda-files (list "~/org/_inbox.org"
-                             "~/org/home.org"
-                             "~/org/ping.org"
+(setq org-agenda-files (list "~/org"
                              ))
 
 (setq org-refile-targets
@@ -33,43 +32,26 @@
         ("~/org/done.org" :maxlevel . 1)
         ("~/org/later.org" :maxlevel . 1)))
 
-(setq org-capture-templates
-      (quote
-       (("w"
-         "Default template"
-         entry
-         (file+headline "~/org/inbox.org" "Inbox")
-         "* %^{Title}\n\n  Source: %u, %c\n\n  %i"
-         :empty-lines 1)
-        ("l"
-         "Link template"
-         entry
-         (file+headline "~/org/inbox.org" "Inbox")
-         "* %c %T"
-         :empty-lines 1
-         :immediate-finish 1)
-        ("v"
-         "Paste link template"
-         plain
-         (function (lambda () nil)) ; do-nothing function for capturing at current point
-         "[[%c][>>]]"
+(setq org-capture-templates `(
+	("p" "Protocol" entry (file+headline ,"~/org/now.org" "Inbox")
+         "* %?[[%:link][%:description]] %U\n%i\n"
          :empty-lines 0
+         :empty-lines-after 2
          :immediate-finish 1
          :unnarrowed 1)
-        ;; ... more templates here ...
-        )))
-
-(defadvice org-capture
-    (after make-full-window-frame activate)
-  "Advise capture to be the only window when used as a popup"
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-other-windows)))
-
-(defadvice org-capture-finalize
-    (after delete-capture-frame activate)
-  "Advise capture-finalize to close the frame"
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-frame)))
+	("L" "Protocol Link" entry (file+headline ,"~/org/now.org" "Inbox")
+         "* %?[[%:link][%:description]] %U"
+         :empty-lines 0
+         :empty-lines-after 2
+         :immediate-finish 1
+         :unnarrowed 1)
+        ("j" "Journal" entry (file+datetree, "~/org/journal.org")
+         "* %?\n%U\n\n\n"
+         :clock-in t
+         :clock-resume t
+         :empty-lines-after 2)
+        )
+)
 
 (defun bk-org-agenda-mode-hook ()
   (local-set-key (kbd "j") 'org-agenda-next-line)
@@ -85,6 +67,21 @@
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
   )
 (add-hook 'org-mode-hook 'bk-org-mode-hook)
+
+(defun bk-org-log-delete ()
+  "Delete logbook drawer of subtree."
+  (interactive)
+  (save-excursion
+    (goto-char (org-log-beginning))
+    (when (save-excursion
+            (save-match-data
+              (beginning-of-line 0)
+              (search-forward-regexp org-drawer-regexp)
+              (goto-char (match-beginning 1))
+              (looking-at "LOGBOOK")))
+      (org-mark-element)
+      (delete-region (region-beginning) (region-end))
+      (org-remove-empty-drawer-at (point)))))
 
 (defun bk-org-fix-whitespace ()
   (interactive)
@@ -197,5 +194,51 @@
     (message "done processing %s" (plist-get entry :title))
     entry))
 
+(require 'browse-url)
+(setq browse-url-browser-function
+      '(
+        (".*\\.dreamworks\\.net" . browse-url-dwa)
+        (".*\\.dreamworks\\.com" . browse-url-dwa)
+        ; Just browse everything using the dwa profile for now
+        ; ("." . my-browse-url-chrome)
+        ("." . browse-url-dwa)
+        ))
+
+(defun browse-url-dwa (url &optional _new-window)
+  "Ask the Google Chrome WWW browser to load URL.
+Default to the URL around or before point.  The strings in
+variable `browse-url-chrome-arguments' are also passed to
+Google Chrome.
+The optional argument NEW-WINDOW is not used."
+  (interactive (browse-url-interactive-arg "URL: "))
+  (setq url (browse-url-encode-url url))
+  (let* ((process-environment (browse-url-process-environment)))
+    (apply 'start-process
+	   (concat "google-chrome " url) nil
+	   "/Users/kenobi/bin/google-chrome"
+	   (append
+	    browse-url-chrome-arguments
+            (list "--profile-directory=Profile 8")
+	    (list url)))))
+
+;; Because the default browse-url-chrome doesn't work.
+(defun my-browse-url-chrome (url &optional _new-window)
+  "Ask the Google Chrome WWW browser to load URL.
+Default to the URL around or before point.  The strings in
+variable `browse-url-chrome-arguments' are also passed to
+Google Chrome.
+The optional argument NEW-WINDOW is not used."
+  (interactive (browse-url-interactive-arg "URL: "))
+  (setq url (browse-url-encode-url url))
+  (let* ((process-environment (browse-url-process-environment)))
+    (apply 'start-process
+	   (concat "google-chrome " url) nil
+	   "/Users/kenobi/bin/google-chrome"
+	   (append
+	    browse-url-chrome-arguments
+            (list "--profile-directory=Default")
+	    (list url)))))
+
+(org-link-set-parameters "dwa" :follow (lambda (path) (browse-url-dwa (concat "https:" path))))
 
 (provide 'bk-org)
