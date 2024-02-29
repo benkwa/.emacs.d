@@ -3,13 +3,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(browse-url-chrome-arguments (quote ("--profile-directory=Default")))
+ '(browse-url-chrome-arguments '("--profile-directory=Default"))
  '(focus-follows-mouse t)
  '(menu-bar-mode nil)
- '(org-id-link-to-org-use-id (quote create-if-interactive-and-no-custom-id))
+ '(org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
  '(package-selected-packages
-   (quote
-    (fill-column-indicator org zenburn-theme request org-edna magithub f magit yasnippet js2-mode)))
+   '(org-sidebar org-roam org magit fill-column-indicator zenburn-theme request org-edna magithub f yasnippet js2-mode))
  '(tool-bar-mode nil))
 
 (custom-set-faces

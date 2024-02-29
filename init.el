@@ -1,12 +1,11 @@
-;; Added by Package.el.  This must come before configurations of
+﻿;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
 
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 ;; Add packages and its subdirs to the load path.
 (let ((default-directory "~/.emacs.d/packages"))
@@ -19,7 +18,8 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
 ;; org mode customizations
-(require 'bk-org)
+;(require 'bk-org)
+(require 'bk-roam)
 
 ;; semantic and ede customizations
 ;; experimental; not working yet
@@ -115,13 +115,13 @@
 (add-hook 'indented-text-mode-hook 'turn-on-auto-fill)
 
 ;; texinfo
-(add-hook 'Info-mode-hook
-  '(lambda() (define-key Info-mode-map [down-mouse-1]
-	       'Info-mouse-follow-nearest-node)))
+;; (add-hook 'Info-mode-hook
+;;   '(lambda() (define-key Info-mode-map [down-mouse-1]
+;; 	       'Info-mouse-follow-nearest-node)))
 ;; Buffer Menu
-(add-hook 'buffer-menu-mode-hook
-  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1]
-	       'Buffer-menu-mouse-select)))
+;; (add-hook 'buffer-menu-mode-hook
+;;   '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1]
+;; 	       'Buffer-menu-mouse-select)))
 
 ;; If non-nil each line of text is exactly one screen line, else wrap text.
 (setq-default truncate-lines nil)
@@ -262,11 +262,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; magit
-(require 'magit)
 ;; We don't use vc-next-action anyways; just use existing muscle memory.
 (global-set-key (kbd "C-x v v") 'magit-status)
 ;; Disable annoying magit warnings
 (setq magit-last-seen-setup-instructions "1.4.0")
+(require 'magit)
+(global-git-commit-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Draw a line to highlight the fill column.
