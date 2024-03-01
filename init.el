@@ -18,8 +18,7 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
 ;; org mode customizations
-;(require 'bk-org)
-(require 'bk-roam)
+(require 'bk-org)
 
 ;; semantic and ede customizations
 ;; experimental; not working yet
