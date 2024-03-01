@@ -36,9 +36,9 @@
          c-offsets-alist))
 
   (setq electric-pair-pairs '(
-                              (?{ . ?})
-                              (?[ . ?])
-                              (?( . ?))))
+                              (?\{ . ?\})
+                              (?\[ . ?\])
+                              (?\( . ?\))))
   (set-fill-column 120)
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 )
@@ -46,7 +46,7 @@
 (add-hook 'c-mode-common-hook 'subword-mode)
 (add-hook 'c-mode-common-hook 'electric-indent-mode)
 (add-hook 'c-mode-common-hook 'electric-pair-mode)
-(add-hook 'c-mode-common-hook 'bk-show-fill-column)
+(add-hook 'c-mode-common-hook 'display-fill-column-indicator-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; build stuff

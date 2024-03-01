@@ -238,30 +238,6 @@
 (global-git-commit-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Draw a line to highlight the fill column.
-
-;; Try out new width indicator.
-(require 'fill-column-indicator)
-(setq fci-rule-width 1)
- ;; this doesn't work for some reason.  Have to set it in each buffer.
-(setq fci-rule-color "green")
-
-(defun bk-show-fill-column()
-  (setq fci-rule-color "green")
-  (fci-mode))
-
-;; Old width indicator code.
-;; (defun font-lock-width-keyword (width)
-;;   "Return a font-lock style keyword for a string beyond width WIDTH
-;; that uses 'compilation-error-face'."
-;;   `((,(format "^%s\\(.+\\)" (make-string width ?.))
-;;      (1 compilation-error-face t))))
-;; (font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
-;; (font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
-;; (font-lock-add-keywords 'js-mode (font-lock-width-keyword 80))
-;; (font-lock-add-keywords 'python-mode (font-lock-width-keyword 80))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff
 
 (defun bk-python-mode-hook ()
@@ -282,7 +258,7 @@
 ;; append so our custom values win
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
-(add-hook 'python-mode-hook 'bk-show-fill-column)
+(add-hook 'python-mode-hook 'display-fill-column-indicator-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
