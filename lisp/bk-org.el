@@ -27,10 +27,10 @@ The optional argument NEW-WINDOW is not used."
   (let* ((process-environment (browse-url-process-environment)))
     (apply 'start-process
 	   (concat "google-chrome " url) nil
-	   "/Users/kenobi/bin/google-chrome"
+           "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 	   (append
 	    browse-url-chrome-arguments
-            (list "--profile-directory=Profile 8")
+            (list "--profile-directory=Profile 1")
 	    (list url)))))
 (with-eval-after-load 'browse-url
   (add-to-list 'browse-url-handlers
@@ -67,7 +67,8 @@ The optional argument NEW-WINDOW is not used."
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
   (org-link-set-parameters "dwa" :follow (lambda (path) (bk-org/browse-url (concat "https:" path))))
-
+  (unbind-key "M-<left>" org-mode-map)
+  (unbind-key "M-<right>" org-mode-map)
   :hook ((org-mode . auto-fill-mode))
   )
 

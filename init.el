@@ -35,13 +35,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
 
-(global-set-key (kbd "<delete>") 'delete-char)
 (global-set-key (kbd "<M-right>") 'forward-word)
 (global-set-key (kbd "<M-left>") 'backward-word)
 (global-set-key (kbd "<C-home>") 'beginning-of-buffer)
 (global-set-key (kbd "<C-end>") 'end-of-buffer)
+
 (global-set-key (kbd "C-z") 'undo)
 
+(global-set-key (kbd "<delete>") 'delete-char)
+(global-set-key (kbd "<M-delete>") 'kill-word)
 
 ;; Indent
 (global-set-key (kbd "<f4>") 'indent-region)
