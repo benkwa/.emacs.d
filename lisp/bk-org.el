@@ -77,12 +77,20 @@
   )
 (add-hook 'org-agenda-mode-hook 'bk-org-agenda-mode-hook)
 
+(defun save-after-capture-refile ()
+  (with-current-buffer (marker-buffer org-capture-last-stored-marker)
+    (save-buffer)))
+
 (defun bk-org-mode-hook ()
+  (advice-add 'org-capture-refile :after 'save-after-capture-refile)
   (local-set-key (kbd "C-M-n") 'org-forward-heading-same-level)
   (local-set-key (kbd "C-M-p") 'org-backward-heading-same-level)
   (local-set-key (kbd "C-M-u") 'outline-up-heading)
   (local-set-key (kbd "C-M-d") 'outline-next-visible-heading)
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+  ;; If this is our org server, set the frame name so we can easily find it
+  (if (string-equal "org" (daemonp))
+    (setq-default frame-title-format "emacs-org: %b - %f"))
   )
 (add-hook 'org-mode-hook 'bk-org-mode-hook)
 
@@ -97,6 +105,11 @@
 *\\*\\*" "
 **" nil (point-min) (point-max))
     (org-set-tags 1 t)))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rtm feeds
 
 (setq bk-rtm-template
       "

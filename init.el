@@ -6,7 +6,7 @@
 
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+             '("melpa" . "https://melpa.org/packages/") t)
 
 ;; Add packages and its subdirs to the load path.
 (let ((default-directory "~/.emacs.d/packages"))
@@ -19,17 +19,20 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
 ;; org mode customizations
-(require 'bk-org)
+;(require 'bk-org)
+(require 'bk-roam)
 
 ;; semantic and ede customizations
 ;; experimental; not working yet
 ; (require 'bk-ede)
 
 ;; snippets and expansions
-(require 'bk-yasnippets)
+;(require 'bk-yasnippets)
 
 ;; scrolling, finding files, switching buffers
 (require 'bk-navigation)
+
+;(require 'bk-frame-hooks)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
@@ -95,7 +98,7 @@
         (when (and (= p (point))
                    (not (bolp)))
           (hippie-expand nil))))))
-                   
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hungry delete ALL the things.
@@ -116,11 +119,11 @@
 
 ;; texinfo
 (add-hook 'Info-mode-hook
-  '(lambda() (define-key Info-mode-map [down-mouse-1] 
+  '(lambda() (define-key Info-mode-map [down-mouse-1]
 	       'Info-mouse-follow-nearest-node)))
 ;; Buffer Menu
 (add-hook 'buffer-menu-mode-hook
-  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1] 
+  '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1]
 	       'Buffer-menu-mouse-select)))
 
 ;; If non-nil each line of text is exactly one screen line, else wrap text.
@@ -263,7 +266,7 @@
 ;; Draw a line to highlight the fill column.
 
 ;; Try out new width indicator.
-(require 'fill-column-indicator)
+;(require 'fill-column-indicator)
 (setq fci-rule-width 1)
  ;; this doesn't work for some reason.  Have to set it in each buffer.
 (setq fci-rule-color "green")
@@ -301,15 +304,19 @@
   (setq fill-column 80)
 )
 
-;; append so our custom values win 
+;; append so our custom values win
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
 (add-hook 'python-mode-hook 'bk-show-fill-column)
 
+(message "enabling elpy")
+(elpy-enable)
+(message "elpy enabled")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
 
-(defun bk-java-mode-hook () 
+(defun bk-java-mode-hook ()
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
@@ -327,7 +334,7 @@
 
 ;; Android customizations
 ; append rather than prepend this because it overrides other java mode settings
-(defun bk-android-java-hook () 
+(defun bk-android-java-hook ()
   (setq c-basic-offset 4)
 )
 ;(add-hook 'java-mode-hook 'bk-android-java-hook 1)
@@ -351,13 +358,17 @@
           (vector cur))))))
 
 (defun bk-c++-mode-hook ()
+  (semantic-mode)
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
   ;; (local-set-key (kbd "<tab>") 'bk-tab-dwim)
   ;; (local-set-key (kbd "TAB") 'bk-tab-dwim)
 ;  (local-set-key (kbd "<C-return>") 'semantic-complete-analyze-and-replace)
-   (local-set-key (kbd "<C-return>") 'hippie-expand)
+   ;; (local-set-key (kbd "<C-return>") 'hippie-expand)
+  (local-set-key (kbd "<C-return>") 'semantic-complete-symbol)
+  (local-set-key (kbd "<M-return>") 'semantic-complete-symbol)
+  (local-set-key (kbd "<M-g s>") 'semantic-ia-fast-jump)
   (local-set-key (kbd "C-c C-x o") 'ff-find-other-file)
  (setq skeleton-pair 1)
 ;  (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
@@ -377,6 +388,7 @@
 (add-hook 'c++-mode-hook 'electric-indent-mode)
 (add-hook 'c++-mode-hook 'electric-pair-mode)
 (add-hook 'c++-mode-hook 'bk-show-fill-column)
+;;(add-hook 'c++-mode-hook 'semantic-mode)
 
 (setq electric-pair-pairs '(
                             (?{ . ?})
@@ -478,15 +490,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode nil)
- '(package-selected-packages
-   (quote
-    (request org-edna magithub f magit yasnippet js2-mode)))
+ '(package-selected-packages '(magit elpy org-edna f js2-mode))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#3F3F3F" :foreground "#DCDCCC" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "ADBO" :family "Source Code Pro"))))
  '(org-link ((t (:foreground "green2" :underline t))))
  '(smerge-refined-added ((t (:inherit smerge-refined-change :background "#308430")))))
 (setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el
