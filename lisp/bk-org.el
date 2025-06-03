@@ -13,7 +13,7 @@
     (mapcar #'expand-file-name
             (let (value)
               (dotimes (number 14)
-                (setq value (cons (daily-file number) value)))
+                (setq value (cons (bk-org/daily-file number) value)))
               value))))
 
 (defun bk-org/browse-url (url &optional _new-window)
@@ -37,7 +37,7 @@ The optional argument NEW-WINDOW is not used."
                '("." . bk-org/browse-url)))
 
 
-
+(message "bk-org foobar")
 (use-package org
   :ensure t
 
@@ -51,9 +51,12 @@ The optional argument NEW-WINDOW is not used."
   ;; Always insert new line before bullet; for plain lists, try to DWIM.
   (org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
   ;; Agenda settings
-  (org-agenda-files (list "~/org-roam/daily"))
+   (org-agenda-files (list "~/org/daily"))
 ;  (org-agenda-files (bk-org/two-weeks))
   (org-persist-directory (file-truename "~/.emacs.cache/org-persist"))
+;  (org-id-locations-file (file-truename "~/.emacs.cache/org-id-locations"))
+  (org-bookmark-names-plist `(:last-refile "org-refile-last-stored"
+                              :last-capture-marker "org-capture-last-stored-marker"))
 
   :bind (("C-c a" . org-agenda)
          :map org-mode-map
@@ -61,6 +64,7 @@ The optional argument NEW-WINDOW is not used."
               ("C-M-p" . org-backward-heading-same-level)
               ("C-M-u" . outline-up-heading)
               ("C-M-d" . outline-next-visible-heading)
+              ("C-c c" . org-capture)
               )
 
   :config
@@ -101,6 +105,10 @@ The optional argument NEW-WINDOW is not used."
          ("C-c n t" . org-roam-dailies-goto-today)
          ("C-c n y" . org-roam-dailies-goto-yesterday)
          ("C-c n d" . org-roam-dailies-goto-date)
+         ("C-c n M-b" . org-roam-dailies-goto-previous-note)
+         ("C-c n M-f" . org-roam-dailies-goto-next-note)
+         ("C-c n M-<left>" . org-roam-dailies-goto-previous-note)
+         ("C-c n M-<right>" . org-roam-dailies-goto-next-note)
          )
   :config
   (org-roam-setup)
@@ -117,6 +125,17 @@ The optional argument NEW-WINDOW is not used."
             ("TODO sort")))
           )
         )
+
+  (setq org-capture-templates
+        `(
+          ("l" "Paste link from clipboard" plain (function ignore)
+           "[[%c][>>]]"
+           :empty-lines 0
+           :immediate-finish 1
+           :no-save 1)
+          )
+        )
+
 
   ;; Place the org buffer in a side window
   (add-to-list 'display-buffer-alist
