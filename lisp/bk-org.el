@@ -9,7 +9,7 @@
 
 (defun bk-org/two-weeks ()
   "Generate a list of the last two weeks of daily files"
-  (let ((default-directory "~/org-roam/daily"))
+  (let ((default-directory "~/org/daily"))
     (mapcar #'expand-file-name
             (let (value)
               (dotimes (number 14)
@@ -36,8 +36,12 @@ The optional argument NEW-WINDOW is not used."
   (add-to-list 'browse-url-handlers
                '("." . bk-org/browse-url)))
 
+(defun setup-auto-commit ()
+  ;;  (setq gac-automatically-push-p t)  ;uncomment for auto-push
+  (setq gac-automatically-add-new-files t)
+  (setq gac-debounce-interval 60) ; seconds
+  )
 
-(message "bk-org foobar")
 (use-package org
   :ensure t
 
@@ -65,6 +69,9 @@ The optional argument NEW-WINDOW is not used."
               ("C-M-u" . outline-up-heading)
               ("C-M-d" . outline-next-visible-heading)
               ("C-c c" . org-capture)
+         ;; :map org-agenda-mode-map
+         ;;      ("j" . org-agenda-next-line)
+         ;;      ("k" . org-agenda-previous-line)
               )
 
   :config
@@ -73,7 +80,10 @@ The optional argument NEW-WINDOW is not used."
   (org-link-set-parameters "dwa" :follow (lambda (path) (bk-org/browse-url (concat "https:" path))))
   (unbind-key "M-<left>" org-mode-map)
   (unbind-key "M-<right>" org-mode-map)
-  :hook ((org-mode . auto-fill-mode))
+  :hook (
+         (org-mode . auto-fill-mode)
+         (org-mode . git-auto-commit-mode)
+         )
   )
 
 
