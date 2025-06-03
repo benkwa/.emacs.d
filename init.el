@@ -18,7 +18,8 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
 ;; org mode customizations
-(require 'bk-org)
+;(require 'bk-org)
+(require 'bk-roam)
 
 ;; semantic and ede customizations
 ;; experimental; not working yet
@@ -31,6 +32,8 @@
 (require 'bk-navigation)
 
 (require 'bk-cc)
+
+;(require 'bk-frame-hooks)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
@@ -117,14 +120,6 @@
 (setq default-major-mode 'indented-text-mode)
 (add-hook 'indented-text-mode-hook 'turn-on-auto-fill)
 
-;; texinfo
-;; (add-hook 'Info-mode-hook
-;;   '(lambda() (define-key Info-mode-map [down-mouse-1]
-;; 	       'Info-mouse-follow-nearest-node)))
-;; Buffer Menu
-;; (add-hook 'buffer-menu-mode-hook
-;;   '(lambda() (define-key Buffer-menu-mode-map [down-mouse-1]
-;; 	       'Buffer-menu-mouse-select)))
 
 ;; If non-nil each line of text is exactly one screen line, else wrap text.
 (setq-default truncate-lines nil)
@@ -236,6 +231,7 @@
 (global-set-key (kbd "C-x v v") 'magit-status)
 ;; Disable annoying magit warnings
 (setq magit-last-seen-setup-instructions "1.4.0")
+
 (require 'magit)
 (global-git-commit-mode t)
 
@@ -262,6 +258,10 @@
 (add-hook 'python-mode-hook 'subword-mode)
 (add-hook 'python-mode-hook 'display-fill-column-indicator-mode)
 
+(message "enabling elpy")
+(elpy-enable)
+(message "elpy enabled")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
 
@@ -287,7 +287,6 @@
   (setq c-basic-offset 4)
 )
 ;(add-hook 'java-mode-hook 'bk-android-java-hook 1)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc

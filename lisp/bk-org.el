@@ -72,6 +72,15 @@ The optional argument NEW-WINDOW is not used."
   :hook ((org-mode . auto-fill-mode))
   )
 
+
+;; (defun save-after-capture-refile ()
+;;   (with-current-buffer (marker-buffer org-capture-last-stored-marker)
+;;     (save-buffer)))
+
+;; (defun bk-org-mode-hook ()
+;;   (advice-add 'org-capture-refile :after 'save-after-capture-refile)
+;; )
+
 (use-package org-roam
   :ensure t
   :custom

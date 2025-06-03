@@ -8,7 +8,7 @@
  '(menu-bar-mode nil)
  '(org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
  '(package-selected-packages
-   '(org-sidebar org-roam org magit fill-column-indicator zenburn-theme request org-edna magithub f yasnippet js2-mode))
+   '(org-sidebar org-roam org magit elpy fill-column-indicator zenburn-theme request org-edna magithub f yasnippet js2-mode))
  '(tool-bar-mode nil))
 
 (custom-set-faces
