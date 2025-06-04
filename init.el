@@ -1,6 +1,4 @@
-﻿
-
-(require 'package)
+﻿(require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
@@ -16,7 +14,6 @@
 
 ;; org mode customizations
 (require 'bk-org)
-;(require 'bk-roam)
 
 ;; semantic and ede customizations
 ;; experimental; not working yet
@@ -29,8 +26,6 @@
 (require 'bk-navigation)
 
 (require 'bk-cc)
-
-;(require 'bk-frame-hooks)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
