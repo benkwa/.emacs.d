@@ -92,8 +92,8 @@ The optional argument NEW-WINDOW is not used."
          ("C-c n i" . org-roam-node-insert)
          ("C-c n c" . org-roam-capture)
          ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today)
          ("C-c n t" . org-roam-dailies-goto-today)
+         ("C-c n n" . org-roam-dailies-goto-tomorrow)
          ("C-c n y" . org-roam-dailies-goto-yesterday)
          ("C-c n d" . org-roam-dailies-goto-date)
          ("C-c n M-b" . org-roam-dailies-goto-previous-note)
@@ -106,14 +106,14 @@ The optional argument NEW-WINDOW is not used."
   (org-roam-db-autosync-mode)
   (setq org-roam-node-display-template "${title:*} ${tags:55}")
 
+
   (setq org-roam-dailies-capture-templates
         '(
           ("d" "default" entry "* %?"
            :target
-           (file+head+olp
+           (file+head
             "%<%Y-%m-%d>.org"
-            "#+title: %<%Y-%m-%d>\n"
-            ("TODO sort")))
+            "#+title: %<%Y-%m-%d>\n\n* TODO sort"))
           )
         )
 
@@ -135,8 +135,19 @@ The optional argument NEW-WINDOW is not used."
                (side . right)
                (slot . 0)
                (window-width . 0.25)
-               (window-parameters . ((no-other-window . t)
+               (window-parameters . (
+                                     ;; For now, try putting the side window in the window rotation
+                                     ;;(no-other-window . t)
                                      (no-delete-other-windows . t)))))
+  ;; Place the org buffer in a regular window
+  ;; (add-to-list 'display-buffer-alist
+  ;;              '("\\*org-roam\\*"
+  ;;                (display-buffer-in-direction)
+  ;;                (direction . right)
+  ;;                (window-width . 0.33)
+  ;;                (window-height . fit-window-to-buffer)))
+
+
   ;; If using org-roam-protocol
   ;(require 'org-roam-protocol)
   )
