@@ -10,7 +10,7 @@
 ;; My packages and customizations
 
 ;; Add my customizations to the load path.
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/bk"))
 
 ;; org mode customizations
 (require 'bk-org)
