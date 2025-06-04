@@ -51,8 +51,8 @@ The optional argument NEW-WINDOW is not used."
   ;; Agenda settings
    (org-agenda-files (list "~/org/daily"))
 ;  (org-agenda-files (bk-org/two-weeks))
-  (org-persist-directory (file-truename "~/.emacs.cache/org-persist"))
-;  (org-id-locations-file (file-truename "~/.emacs.cache/org-id-locations"))
+  (org-persist-directory (file-truename "~/.emacs.d.cache/org-persist"))
+  (org-id-locations-file (file-truename "~/.emacs.d.cache/org-id-locations"))
   (org-bookmark-names-plist `(:last-refile "org-refile-last-stored"
                               :last-capture-marker "org-capture-last-stored-marker"))
 
@@ -63,9 +63,6 @@ The optional argument NEW-WINDOW is not used."
               ("C-M-u" . outline-up-heading)
               ("C-M-d" . outline-next-visible-heading)
               ("C-c c" . org-capture)
-         ;; :map org-agenda-mode-map
-         ;;      ("j" . org-agenda-next-line)
-         ;;      ("k" . org-agenda-previous-line)
               )
 
   :config

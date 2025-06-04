@@ -6,7 +6,6 @@
 
 # Backup files
 *~
-autosaves
 
 # Undo-tree save-files
 *.~undo-tree

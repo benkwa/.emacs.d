@@ -2,6 +2,9 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
+;; TODO
+; get browser support working
+
 ;; Add packages and its subdirs to the load path.
 (let ((default-directory "~/.emacs.d/packages"))
   (normal-top-level-add-subdirs-to-load-path))
@@ -201,12 +204,12 @@
 ;; we want to kill the whole line when doing a Ctrl-k
 (setq kill-whole-line t)
 
-;; Put autosave files (ie #foo#) and backup files (ie foo~) in ~/.emacs.d/.
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
-(setq backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
+;; Put autosave files (ie #foo#) and backup files (ie foo~) in ~/.emacs.d.cache/.
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d.cache/autosaves/\\1" t)))
+(setq backup-directory-alist '((".*" . "~/.emacs.d.cache/backups/")))
 
 ;; create the autosave dir if necessary, since emacs won't.
-(make-directory "~/.emacs.d/autosaves/" t)
+(make-directory "~/.emacs.d.cache/autosaves/" t)
 
 ;; Turn on the visible bell, and make it less annoying
 (setq ring-bell-function
@@ -223,6 +226,10 @@
 (global-set-key (kbd "C-x v v") 'magit-status)
 ;; Disable annoying magit warnings
 (setq magit-last-seen-setup-instructions "1.4.0")
+
+(setq transient-history-file "~/.emacs.d.cache/transient/history.el")
+(setq transient-levels-file "~/.emacs.d.cache/transient/levels.el")
+(setq transient-values-file "~/.emacs.d.cache/transient/values.el")
 
 (require 'magit)
 (global-git-commit-mode t)
@@ -252,6 +259,7 @@
 
 (message "enabling elpy")
 (elpy-enable)
+(setq elpy-rpc-virtualenv-path "~/.emacs.d.cache/elpy")
 (message "elpy enabled")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -3,7 +3,8 @@
 
 ;; Open links in chromium
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium-browser")
+      browse-url-generic-program "google-chrome-stable")
+
 
 ;; Various backspace-fixing attempts
 
