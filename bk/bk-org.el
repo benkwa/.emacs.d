@@ -143,8 +143,7 @@ The optional argument NEW-WINDOW is not used."
                (slot . 0)
                (window-width . 0.25)
                (window-parameters . (
-                                     ;; For now, try putting the side window in the window rotation
-                                     ;;(no-other-window . t)
+                                     (no-other-window . t)
                                      (no-delete-other-windows . t)))))
   ;; Place the org buffer in a regular window
   ;; (add-to-list 'display-buffer-alist
