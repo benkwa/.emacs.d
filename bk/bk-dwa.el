@@ -5,6 +5,7 @@
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "google-chrome-stable")
 
+(setq bk/browser-function 'browse-url-chrome)
 
 ;; Various backspace-fixing attempts
 

@@ -1,6 +1,9 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org stuff
 
+;; for bk/browse-url
+(require 'bk-navigation)
+
 
 (defun bk-org/daily-file (day)
   "Generate a daily file (day) days before today"
@@ -15,26 +18,6 @@
               (dotimes (number 14)
                 (setq value (cons (bk-org/daily-file number) value)))
               value))))
-
-(defun bk-org/browse-url (url &optional _new-window)
-  "Ask the Google Chrome WWW browser to load URL.
-Default to the URL around or before point.  The strings in
-variable `browse-url-chrome-arguments' are also passed to
-Google Chrome.
-The optional argument NEW-WINDOW is not used."
-  (interactive (browse-url-interactive-arg "URL: "))
-  (setq url (browse-url-encode-url url))
-  (let* ((process-environment (browse-url-process-environment)))
-    (apply 'start-process
-	   (concat "google-chrome " url) nil
-           "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-	   (append
-	    browse-url-chrome-arguments
-            (list "--profile-directory=Profile 1")
-	    (list url)))))
-(with-eval-after-load 'browse-url
-  (add-to-list 'browse-url-handlers
-               '("." . bk-org/browse-url)))
 
 (use-package org
   :ensure t
@@ -68,7 +51,9 @@ The optional argument NEW-WINDOW is not used."
   :config
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (org-link-set-parameters "dwa" :follow (lambda (path) (bk-org/browse-url (concat "https:" path))))
+  (org-link-set-parameters "dwa" :follow (lambda (path) (bk/browse-url (concat "https:" path))))
+  (org-link-set-parameters "jira"
+      :follow (lambda (id) (bk/browse-url (concat "https://dreamworks.atlassian.net/browse/" id))))
   (unbind-key "M-<left>" org-mode-map)
   (unbind-key "M-<right>" org-mode-map)
   :hook ((org-mode . auto-fill-mode))
@@ -87,7 +72,7 @@ The optional argument NEW-WINDOW is not used."
   :ensure t
   :custom
   (org-roam-directory (file-truename "~/org"))
-  (org-roam-db-location (file-truename "~/.emacs.cache/org-roam.db"))
+  (org-roam-db-location (file-truename "~/.emacs.d.cache/org-roam.db"))
 
   (org-roam-mode-sections
    (list #'org-roam-backlinks-section

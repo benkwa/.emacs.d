@@ -2,9 +2,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; TODO
-; get browser support working
-
 ;; Add packages and its subdirs to the load path.
 (let ((default-directory "~/.emacs.d/packages"))
   (normal-top-level-add-subdirs-to-load-path))
@@ -15,9 +12,6 @@
 ;; Add my customizations to the load path.
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/bk"))
 
-;; org mode customizations
-(require 'bk-org)
-
 ;; semantic and ede customizations
 ;; experimental; not working yet
 ; (require 'bk-ede)
@@ -25,10 +19,13 @@
 ;; snippets and expansions
 ;(require 'bk-yasnippets)
 
-;; scrolling, finding files, switching buffers
+;; scrolling, finding files, switching buffers, browser
 (require 'bk-navigation)
 
 (require 'bk-cc)
+
+;; org mode customizations
+(require 'bk-org)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
