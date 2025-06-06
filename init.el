@@ -12,13 +12,6 @@
 ;; Add my customizations to the load path.
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/bk"))
 
-;; semantic and ede customizations
-;; experimental; not working yet
-; (require 'bk-ede)
-
-;; snippets and expansions
-;(require 'bk-yasnippets)
-
 ;; scrolling, finding files, switching buffers, browser
 (require 'bk-navigation)
 
@@ -219,6 +212,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; magit
+
 ;; We don't use vc-next-action anyways; just use existing muscle memory.
 (global-set-key (kbd "C-x v v") 'magit-status)
 ;; Disable annoying magit warnings

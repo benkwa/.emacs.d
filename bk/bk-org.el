@@ -19,53 +19,50 @@
   :ensure t
 
   :custom
-  ;; Log timestamps for done items
-  (org-log-done t)
-  ;; Start in indented mode
-  (org-startup-indented t)
-  ;; Right-justify tags to column 80
-  (org-tags-column -80)
+  (org-log-done t) ; Log timestamps for done items
+  (org-startup-indented t) ; Start in indented mode
+  (org-tags-column -80); Right-justify tags to column 80
   ;; Always insert new line before bullet; for plain lists, try to DWIM.
   (org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
-  ;; Agenda settings
-   (org-agenda-files (list "~/org/daily"))
-;  (org-agenda-files (bk-org/two-weeks))
+  (org-agenda-files (list "~/org/daily")) ; pull agenda from daily files
+  ;;(org-agenda-files (bk-org/two-weeks)) ; experiment: only use last 2 weeks
   (org-persist-directory (file-truename "~/.emacs.d.cache/org-persist"))
   (org-id-locations-file (file-truename "~/.emacs.d.cache/org-id-locations"))
   (org-bookmark-names-plist `(:last-refile "org-refile-last-stored"
                               :last-capture-marker "org-capture-last-stored-marker"))
+  (org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 
-  :bind (("C-c a" . org-agenda)
-         :map org-mode-map
-              ("C-M-n" . org-forward-heading-same-level)
-              ("C-M-p" . org-backward-heading-same-level)
-              ("C-M-u" . outline-up-heading)
-              ("C-M-d" . outline-next-visible-heading)
-              ("C-c c" . org-capture)
-              )
+  :bind
+  (("C-c a" . org-agenda)
+   :map org-mode-map
+   ("C-M-n" . org-forward-heading-same-level)
+   ("C-M-p" . org-backward-heading-same-level)
+   ("C-M-u" . outline-up-heading)
+   ("C-M-d" . outline-next-visible-heading)
+   ("C-c c" . org-capture)
+   )
 
   :config
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (org-link-set-parameters "dwa" :follow (lambda (path) (browse-url-chrome (concat "https:" path))))
+  (org-link-set-parameters "dwa"
+      :follow (lambda (path) (browse-url-chrome (concat "https:" path))))
   (org-link-set-parameters "jira"
       :follow (lambda (id) (browse-url-chrome (concat "https://dreamworks.atlassian.net/browse/" id))))
   (unbind-key "M-<left>" org-mode-map)
   (unbind-key "M-<right>" org-mode-map)
-  :hook ((org-mode . auto-fill-mode))
+
+  :hook
+  ((org-mode . auto-fill-mode))
+
+  :custom-face
+  (org-link ((t (:foreground "green2" :underline t))))
   )
 
 
-;; (defun save-after-capture-refile ()
-;;   (with-current-buffer (marker-buffer org-capture-last-stored-marker)
-;;     (save-buffer)))
-
-;; (defun bk-org-mode-hook ()
-;;   (advice-add 'org-capture-refile :after 'save-after-capture-refile)
-;; )
-
 (use-package org-roam
   :ensure t
+
   :custom
   (org-roam-directory (file-truename "~/org"))
   (org-roam-db-location (file-truename "~/.emacs.d.cache/org-roam.db"))
@@ -74,27 +71,28 @@
    (list #'org-roam-backlinks-section
          #'org-roam-reflinks-section
          ))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n t" . org-roam-dailies-goto-today)
-         ("C-c n n" . org-roam-dailies-goto-tomorrow)
-         ("C-c n y" . org-roam-dailies-goto-yesterday)
-         ("C-c n d" . org-roam-dailies-goto-date)
-         ("C-c n M-b" . org-roam-dailies-goto-previous-note)
-         ("C-c n M-f" . org-roam-dailies-goto-next-note)
-         ("C-c n M-<left>" . org-roam-dailies-goto-previous-note)
-         ("C-c n M-<right>" . org-roam-dailies-goto-next-note)
-         )
+
+  :bind
+  (("C-c n l" . org-roam-buffer-toggle)
+   ("C-c n f" . org-roam-node-find)
+   ("C-c n g" . org-roam-graph)
+   ("C-c n i" . org-roam-node-insert)
+   ("C-c n c" . org-roam-capture)
+   ;; Dailies
+   ("C-c n t" . org-roam-dailies-goto-today)
+   ("C-c n n" . org-roam-dailies-goto-tomorrow)
+   ("C-c n y" . org-roam-dailies-goto-yesterday)
+   ("C-c n d" . org-roam-dailies-goto-date)
+   ("C-c n M-b" . org-roam-dailies-goto-previous-note)
+   ("C-c n M-f" . org-roam-dailies-goto-next-note)
+   ("C-c n M-<left>" . org-roam-dailies-goto-previous-note)
+   ("C-c n M-<right>" . org-roam-dailies-goto-next-note)
+   )
+
   :config
   (org-roam-setup)
   (org-roam-db-autosync-mode)
   (setq org-roam-node-display-template "${title:*} ${tags:55}")
-
-
   (setq org-roam-dailies-capture-templates
         '(
           ("d" "default" entry "* %?"
@@ -104,7 +102,6 @@
             "#+title: %<%Y-%m-%d>\n\n* TODO sort"))
           )
         )
-
   (setq org-capture-templates
         `(
           ("l" "Paste link from clipboard" plain (function ignore)
@@ -114,8 +111,6 @@
            :no-save 1)
           )
         )
-
-
   ;; Place the org buffer in a side window
   (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
@@ -133,10 +128,6 @@
   ;;                (direction . right)
   ;;                (window-width . 0.33)
   ;;                (window-height . fit-window-to-buffer)))
-
-
-  ;; If using org-roam-protocol
-  ;(require 'org-roam-protocol)
   )
 
 
@@ -144,53 +135,5 @@
 (defun my/sleep (_1 &optional _2)
   (sleep-for 0 1))
 (advice-add 'org-roam-db-query :before 'my/sleep)
-
-
-;; (setq org-capture-templates `(
-;; 	("p" "Protocol" entry (file+headline ,"~/org/now.org" "Inbox")
-;;          "* %?[[%:link][%:description]] %U\n%i\n"
-;;          :empty-lines 0
-;;          :empty-lines-after 2
-;;          :immediate-finish 1
-;;          :unnarrowed 1)
-;; 	("L" "Protocol Link" entry (file+headline ,"~/org/now.org" "Inbox")
-;;          "* %?[[%:link][%:description]] %U"
-;;          :empty-lines 0
-;;          :empty-lines-after 2
-;;          :immediate-finish 1
-;;          :unnarrowed 1)
-;;         ("l" "Paste link from clipboard" plain (function ignore)
-;;          "[[%c][>>]]"
-;;          :empty-lines 0
-;;          :immediate-finish 1
-;;          :no-save 1
-;;          )
-;;         ("j" "Journal" entry (file+datetree, "~/org/journal.org")
-;;          "* %?\n%U\n\n\n"
-;;          :clock-in t
-;;          :clock-resume t
-;;          :empty-lines-after 2)
-;;         ("m" "Meeting notes" entry (file+headline, "~/org/now.org" "Inbox")
-;;          "* %?\n%U\n\n\n"
-;;          :clock-in t
-;;          :clock-resume t
-;;          :empty-lines-after 2)
-;;         )
-;; )
-
-
-;; (defun bk-org-fix-whitespace ()
-;;   (interactive)
-;;   (save-excursion
-;;     (replace-regexp "^
-;; *\\* " "
-
-;; * " nil (point-min) (point-max))
-;;     (replace-regexp "^
-;; *\\*\\*" "
-;; **" nil (point-min) (point-max))
-;;     (org-set-tags 1 t)))
-
-
 
 (provide 'bk-org)
