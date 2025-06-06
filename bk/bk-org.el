@@ -1,10 +1,6 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org stuff
 
-;; for bk/browse-url
-(require 'bk-navigation)
-
-
 (defun bk-org/daily-file (day)
   "Generate a daily file (day) days before today"
   (format-time-string "%Y-%m-%d.org" (- (time-convert nil 'integer) (* 86400 day)))
@@ -51,9 +47,9 @@
   :config
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (org-link-set-parameters "dwa" :follow (lambda (path) (bk/browse-url (concat "https:" path))))
+  (org-link-set-parameters "dwa" :follow (lambda (path) (browse-url-chrome (concat "https:" path))))
   (org-link-set-parameters "jira"
-      :follow (lambda (id) (bk/browse-url (concat "https://dreamworks.atlassian.net/browse/" id))))
+      :follow (lambda (id) (browse-url-chrome (concat "https://dreamworks.atlassian.net/browse/" id))))
   (unbind-key "M-<left>" org-mode-map)
   (unbind-key "M-<right>" org-mode-map)
   :hook ((org-mode . auto-fill-mode))

@@ -93,34 +93,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; browser support
 
-;; TODO is this still needed?
-(defun bk/browse-url-helper (url &optional _new-window)
-  "Ask the Google Chrome WWW browser to load URL.
-Default to the URL around or before point.  The strings in
-variable `browse-url-chrome-arguments' are also passed to
-Google Chrome.
-The optional argument NEW-WINDOW is not used."
-  (interactive (browse-url-interactive-arg "URL: "))
-  (setq url (browse-url-encode-url url))
-  (let* ((process-environment (browse-url-process-environment)))
-    (apply 'start-process
-	   (concat "google-chrome " url) nil
-           "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-	   (append
-	    browse-url-chrome-arguments
-            (list "--profile-directory=Profile 1")
-	    (list url)))))
+(use-package browse-url
+  :defer t
+  :config
+  (when (eq system-type 'darwin)
+    (setq browse-url-chrome-program "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+          browse-url-chrome-arguments '("--profile-directory=Profile 1")
+          )
+    )
+  (when (eq system-type 'gnu/linux)
+    (setq browse-url-chrome-arguments '("--profile-directory=Default"))
+    )
+  (setq browse-url-browser-function #'browse-url-chrome)
+  )
 
-;; Support for changing the browser
-(defvar bk/browser-function 'bk/browse-url-helper "browser")
-
-(defun bk/browse-url (url &optional _new-window)
-  (funcall bk/browser-function url _new-window))
-
-;; This seems to break org-open-at-point for URLs
-;; (with-eval-after-load 'browse-url
-;;   (add-to-list 'browse-url-handlers
-;;                '("." . bk/browse-url)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

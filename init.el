@@ -254,11 +254,6 @@
 (add-hook 'python-mode-hook 'subword-mode)
 (add-hook 'python-mode-hook 'display-fill-column-indicator-mode)
 
-(message "enabling elpy")
-(elpy-enable)
-(setq elpy-rpc-virtualenv-path "~/.emacs.d.cache/elpy")
-(message "elpy enabled")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java stuff
 
