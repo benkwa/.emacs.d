@@ -14,10 +14,7 @@
 
 ;; scrolling, finding files, switching buffers, browser
 (require 'bk-navigation)
-
 (require 'bk-cc)
-
-;; org mode customizations
 (require 'bk-org)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -69,30 +66,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tab expansion
-(require 'bk-hippie-expand)
-
-(defun bk-tab-dwim ()
-  "If in the minibuffer, call minibuffer-expand. Else, if mark is
-    active, indent region. Else if point is at the end of a
-    symbol, expand it. Else indent the current line."
-  (interactive)
-  (if (minibufferp)
-      (minibuffer-complete)
-    (if mark-active
-        (indent-region (region-beginning)
-                       (region-end))
-      (let ((p (point)))
-        (indent-according-to-mode)
-        (when (and (= p (point))
-                   (not (bolp)))
-          (hippie-expand nil))))))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Hungry delete ALL the things.
-;(require 'hungry-delete)
-;(global-hungry-delete-mode)
-
+;; (require 'bk-hippie-expand)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Auto-insert text when making new *.cpp, *.cc, *.h files.
@@ -108,26 +82,6 @@
 
 ;; If non-nil each line of text is exactly one screen line, else wrap text.
 (setq-default truncate-lines nil)
-
-(setq imenu-always-use-completion-buffer-p t)
-
-
-(defun change-var-in-file( var file val )
-  "Changes the variable named var in the given file with the given val and saves it"
-  (let (buf)
-    (save-excursion
-      (setq buf (find-file-noselect file))
-      (set-buffer buf)
-      (beginning-of-buffer)
-      (if (search-forward-regexp (concat "^(defvar[ \t]+"
-					 var
-					 "[ \t]+\\(t\\|nil\\))")
-				 nil t)
-	  (save-restriction
-	    (narrow-to-region (match-beginning 1) (match-end 1))
-	    (replace-match val t nil nil 1)
-	    (save-buffer))))))
-
 
 ;; HTML/SGML related stuff
 
@@ -213,18 +167,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; magit
 
-;; We don't use vc-next-action anyways; just use existing muscle memory.
-(global-set-key (kbd "C-x v v") 'magit-status)
-;; Disable annoying magit warnings
-(setq magit-last-seen-setup-instructions "1.4.0")
+(use-package magit
+  :defer t
+  
+  :custom
+  (transient-history-file "~/.emacs.d.cache/transient/history.el")
+  (transient-levels-file "~/.emacs.d.cache/transient/levels.el")
+  (transient-values-file "~/.emacs.d.cache/transient/values.el")
 
-(setq transient-history-file "~/.emacs.d.cache/transient/history.el")
-(setq transient-levels-file "~/.emacs.d.cache/transient/levels.el")
-(setq transient-values-file "~/.emacs.d.cache/transient/values.el")
+  :bind
+  ("C-x v v" . magit-status)
+  )
 
-(require 'magit)
-(global-git-commit-mode t)
+(use-package git-commit
+  :demand t
+  :config
+  (global-git-commit-mode))
 
+  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff
 
@@ -247,99 +207,6 @@
 (add-hook 'python-mode-hook 'bk-python-mode-hook 1)
 (add-hook 'python-mode-hook 'subword-mode)
 (add-hook 'python-mode-hook 'display-fill-column-indicator-mode)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; java stuff
-
-(defun bk-java-mode-hook ()
-  (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
-  (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
-  (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-  (local-set-key (kbd "<tab>") 'bk-tab-dwim)
-  (local-set-key (kbd "TAB") 'bk-tab-dwim)
-
-  (setq skeleton-pair 1)
-  (local-set-key (kbd "<") 'skeleton-pair-insert-maybe)
-  (set-fill-column 100)
-)
-(add-hook 'java-mode-hook 'bk-java-mode-hook)
-(add-hook 'java-mode-hook 'subword-mode)
-(add-hook 'java-mode-hook 'electric-indent-mode)
-(add-hook 'java-mode-hook 'electric-pair-mode)
-
-;; Android customizations
-; append rather than prepend this because it overrides other java mode settings
-(defun bk-android-java-hook ()
-  (setq c-basic-offset 4)
-)
-;(add-hook 'java-mode-hook 'bk-android-java-hook 1)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; misc
-
-(require 'smerge-mode)
-(defface smerge-mine-bk
-  '((((min-colors 88) (background light))
-     (:foreground "blue1"))
-    (((background light))
-     (:foreground "blue"))
-    (((min-colors 88) (background dark))
-     (:foreground "cyan1"))
-    (((background dark))
-     (:foreground "cyan")))
-  "Face for your code."
-  :group 'smerge)
-(defface smerge-other
-  '((((background light))
-     (:foreground "magenta"))
-    (((background dark))
-     (:background "magenta")))
-  "Face for the other code."
-  :group 'smerge)
-(defface smerge-refined-added
-  '((t :background "dark olive green"))
-    "foobar"
-    :group 'smerge)
-;;(setq smerge-other-face 'smerge-other-bk)
-
-(defun bk-kill-emacs()
-  (save-some-buffers 1)
-  (kill-emacs))
-
-(defun bk-save-as (filename)
-  (interactive "F")
-  (save-restriction (widen)  (write-region (point-min) (point-max) filename)))
-
-;(add-to-list 'default-frame-alist '(font . "lucidasanstypewriter-14"))
-;; new metacity has some font bug that causes emacs to hang up waiting
-;; for a response when setting the font.  Tell emacs not to wait for
-;; the wm.
-;;(modify-frame-parameters nil '((wait-for-wm . nil)))
-
-;; (defun my-display-completions (buf)
-;;   "put the *completions* buffer in a small, new window below the current one"
-;;   (if (active-minibuffer-window)
-;;       ; minibuffer is active - show completion buffer the regular way
-;;       (let (special-display-buffer-names)
-;; 	(display-buffer buf))
-;;       ; else, we're in a regular editing window - split it and show
-;;       ; the completion buffer below
-;;       (let ((target-window (split-window-vertically -10)))
-;; 	(set-window-buffer target-window buf)
-;; 	target-window)
-;;   )
-;; )
-
-;; display line numbers
-;; (require 'wb-line-number)
-;; (setq wb-line-number-scroll-bar nil)
-;; (setq wb-line-number-text-width 4)
-;; (require 'setnu)
-
-;; find files in tags
-;; (require 'find-file-in-tags)
-
-;; (autoload 'gtags-mode "gtags" "" t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -371,4 +238,3 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-(setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el

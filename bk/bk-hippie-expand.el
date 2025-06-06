@@ -61,4 +61,20 @@
     ad-do-it))
 (ad-activate 'hippie-expand)
 
+(defun bk-tab-dwim ()
+  "If in the minibuffer, call minibuffer-expand. Else, if mark is
+    active, indent region. Else if point is at the end of a
+    symbol, expand it. Else indent the current line."
+  (interactive)
+  (if (minibufferp)
+      (minibuffer-complete)
+    (if mark-active
+        (indent-region (region-beginning)
+                       (region-end))
+      (let ((p (point)))
+        (indent-according-to-mode)
+        (when (and (= p (point))
+                   (not (bolp)))
+          (hippie-expand nil))))))
+
 (provide 'bk-hippie-expand)
