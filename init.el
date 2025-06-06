@@ -2,10 +2,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; Add packages and its subdirs to the load path.
-(let ((default-directory "~/.emacs.d/packages"))
-  (normal-top-level-add-subdirs-to-load-path))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; My packages and customizations
 
@@ -212,14 +208,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; themes stuff
 
-(if (version< emacs-version "24")
-    (progn
-      (require 'color-theme)
-      (require 'zenburn)
-      (color-theme-zenburn))
-  (progn
-    (add-to-list 'custom-theme-load-path "~/.emacs.d/packages/zenburn-emacs")
-    (load-theme 'zenburn t)))
+(use-package zenburn-theme
+  :demand t
+  :config (load-theme 'zenburn t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; semantic
