@@ -37,6 +37,10 @@
 ;; Fix the buffer when it gets ugly
 (global-set-key (kbd "C-c r") 'font-lock-fontify-buffer)
 
+;; This is just annoying
+(unbind-key "C-x C-z" global-map)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; colors
 
@@ -165,7 +169,7 @@
 
 (use-package magit
   :defer t
-  
+
   :custom
   (transient-history-file "~/.emacs.d.cache/transient/history.el")
   (transient-levels-file "~/.emacs.d.cache/transient/levels.el")
@@ -180,7 +184,7 @@
   :config
   (global-git-commit-mode))
 
-  
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff
 
@@ -228,4 +232,3 @@
 ;; customize stuff
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
-

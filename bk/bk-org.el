@@ -34,29 +34,51 @@
 
   :bind
   (("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
    :map org-mode-map
    ("C-M-n" . org-forward-heading-same-level)
    ("C-M-p" . org-backward-heading-same-level)
    ("C-M-u" . outline-up-heading)
    ("C-M-d" . outline-next-visible-heading)
-   ("C-c c" . org-capture)
    )
 
   :config
   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (org-link-set-parameters "dwa"
-      :follow (lambda (path) (browse-url-chrome (concat "https:" path))))
   (org-link-set-parameters "jira"
-      :follow (lambda (id) (browse-url-chrome (concat "https://dreamworks.atlassian.net/browse/" id))))
+      :follow (lambda (id) (browse-url-chrome (concat "https://dreamworks.atlassian.net/browse/" id)))
+      :face 'org-link-jira)
+  (org-link-set-parameters "pr"
+      :follow (lambda (id) (browse-url-chrome (concat "https://github.com/dwanim/premo/issues/" id)))
+      :face 'org-link-jira)
+  (org-link-set-parameters "id" :face 'org-link-id)
+
   (unbind-key "M-<left>" org-mode-map)
   (unbind-key "M-<right>" org-mode-map)
+
+  (defun bk/add-org-link ()
+    (interactive)
+    (let ((link-node (org-roam-node-read)))
+      (if (org-roam-node-id link-node)
+          (let ((this-node (org-roam-node-at-point 'assert))
+                (link-id (org-roam-node-id link-node))
+                (link-title (org-roam-node-title link-node)))
+            (save-excursion
+              (goto-char (org-roam-node-point this-node))
+              (org-roam-property-add "LINKS"
+                                     (org-link-make-string (concat "id:" link-id) link-title)))
+            )
+        (error "no such node")
+        )))
 
   :hook
   ((org-mode . auto-fill-mode))
 
   :custom-face
-  (org-link ((t (:foreground "green2" :underline t))))
+  (org-link ((t (:foreground "steelblue1" :underline t)))) ; http/https
+  (org-link-id ((t (:foreground "green2" :underline t))))      ; internal org links
+  (org-link-jira ((t (:foreground "sienna2" :underline t)))) ; jira tickets
+  (org-date ((t (:underline nil))))
   )
 
 
@@ -73,20 +95,25 @@
          ))
 
   :bind
-  (("C-c n l" . org-roam-buffer-toggle)
+  (;; global - navigation
    ("C-c n f" . org-roam-node-find)
-   ("C-c n g" . org-roam-graph)
    ("C-c n i" . org-roam-node-insert)
-   ("C-c n c" . org-roam-capture)
-   ;; Dailies
+   ("C-c n k" . (lambda() (interactive) (find-file "~/org/kiv.org"))) ; kiv
+   ("C-c n n" . (lambda() (interactive) (find-file "~/org/now.org"))) ; now
    ("C-c n t" . org-roam-dailies-goto-today)
-   ("C-c n n" . org-roam-dailies-goto-tomorrow)
+   ("C-c n S-t" . org-roam-dailies-goto-tomorrow)
    ("C-c n y" . org-roam-dailies-goto-yesterday)
    ("C-c n d" . org-roam-dailies-goto-date)
+
+   :map org-mode-map
+   ;; navigation
+   ("C-c n l" . org-roam-buffer-toggle)
    ("C-c n M-b" . org-roam-dailies-goto-previous-note)
    ("C-c n M-f" . org-roam-dailies-goto-next-note)
    ("C-c n M-<left>" . org-roam-dailies-goto-previous-note)
    ("C-c n M-<right>" . org-roam-dailies-goto-next-note)
+   ;; links
+   ("C-c l n" . bk/add-org-link)
    )
 
   :config
@@ -109,7 +136,10 @@
            :empty-lines 0
            :immediate-finish 1
            :no-save 1)
-          )
+        ("t" "TODO" entry (file "~/org/now.org")
+         "* TODO %?\n%U"
+         :empty-lines 1)
+        )
         )
   ;; Place the org buffer in a side window
   (add-to-list 'display-buffer-alist
