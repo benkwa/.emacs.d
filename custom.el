@@ -6,7 +6,7 @@
  '(focus-follows-mouse t)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(git-auto-commit-mode org-sidebar org-roam org magit elpy fill-column-indicator zenburn-theme request org-edna magithub f yasnippet js2-mode))
+   '(consult embark embark-consult marginalia vertico orderless git-auto-commit-mode org-sidebar org-roam org magit elpy fill-column-indicator zenburn-theme request org-edna magithub f yasnippet js2-mode))
  '(tool-bar-mode nil)
  '(warning-suppress-types '((server))))
 

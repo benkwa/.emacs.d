@@ -13,6 +13,38 @@
 (require 'bk-cc)
 (require 'bk-org)
 
+;; test completion
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
+
+(use-package orderless
+  :ensure t
+  :init
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+
+(use-package marginalia
+  :ensure t
+  :config
+  (marginalia-mode))
+
+(use-package consult
+  :ensure t)
+
+(use-package embark
+  :ensure t
+  :bind
+  ("M-." . embark-dwim)
+  ("C-." . embark-act)
+  :hook
+  (minibuffer-setup . vertico-repeat-save)) ;; requires vertico-repeat extension
+
+(use-package embark-consult :ensure t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global key bindings
 
