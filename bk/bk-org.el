@@ -24,8 +24,8 @@
   (org-tags-column -80); Right-justify tags to column 80
   ;; Always insert new line before bullet; for plain lists, try to DWIM.
   (org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
-  (org-agenda-files (list "~/org/daily")) ; pull agenda from daily files
-  ;;(org-agenda-files (bk-org/two-weeks)) ; experiment: only use last 2 weeks
+  (org-agenda-files (list "~/org/kiv.org" "~/org/now.org" "~/org/daily")) ; pull agenda from daily files
+;  (org-agenda-files (bk-org/two-weeks)) ; experiment: only use last 2 weeks
   (org-persist-directory (file-truename "~/.emacs.d.cache/org-persist"))
   (org-id-locations-file (file-truename "~/.emacs.d.cache/org-id-locations"))
   (org-bookmark-names-plist `(:last-refile "org-refile-last-stored"
