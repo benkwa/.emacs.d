@@ -15,3 +15,6 @@ semanticdb
 elpa
 ede-projects.el
 bookmarks
+
+# Custom file is local
+custom.el

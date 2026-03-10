@@ -93,21 +93,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; browser support
 
+;; See browse-url-chrome-arguments customization for profile directory
+;; See browse-url-chrome-program customization for chrome location
 (use-package browse-url
-  :defer t
-  :config
-  (when (eq system-type 'darwin)
-    (setq browse-url-chrome-program "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-          browse-url-chrome-arguments '("--profile-directory=Profile 1")
-          )
-    )
-  (when (eq system-type 'gnu/linux)
-    (setq browse-url-chrome-arguments '("--profile-directory=Default"))
-    )
-  (setq browse-url-browser-function #'browse-url-chrome)
+  :custom
+  (browse-url-browser-function #'browse-url-chrome "Use chrome as our browser")
   )
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tag support
