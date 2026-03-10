@@ -216,6 +216,33 @@
   :config
   (global-git-commit-mode))
 
+(add-to-list 'auto-mode-alist '("\\.ldf" . yaml-mode))
+(use-package outline-indent
+  :ensure t
+  :hook (yaml-mode . outline-indent-minor-mode)
+  :commands outline-indent-minor-mode
+  :custom
+  (outline-indent-ellipsis " ▼")
+  (outline-blank-line t)
+  :bind
+  (:map outline-indent-minor-mode-map
+   ("<tab>" . 'outline-indent-toggle-fold)
+   ("TAB" . 'outline-indent-toggle-fold)
+   ("C-M-n" . 'outline-indent-forward-same-level)
+   ("C-M-p" . 'outline-indent-backward-same-level)
+   ("C-M-u" . 'outline-up-heading)
+   ("C-M-d" . (lambda() (interactive) (outline-indent-open-fold) (outline-next-visible-heading 1)))
+   )
+  :config
+  (add-hook 'outline-minor-mode-hook
+            #'(lambda() (setq-local make-window-start-visible t)))
+  ;; automatically close all folds on mode activation
+  (add-hook 'outline-indent-minor-mode-hook
+            #'(lambda()
+                (when (derived-mode-p 'yaml-mode)
+                  (outline-indent-close-folds))))
+)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python stuff
